@@ -6,6 +6,8 @@ Parser::~Parser() {
 	delete faces;
 }
 
+// Parse .obj file
+// creates new shape
 void Parser::parse(const char *path) {
 	tokenizer = new Tokenizer();
 	tokenizer->tokenize(path);
@@ -28,6 +30,8 @@ void Parser::parse(const char *path) {
 	delete tokenizer;
 }
 
+// Parse .mtl file
+// creates new material
 void Parser::parseMaterialLibrary(String *path) {
 	materialTokenizer = new Tokenizer();
 	materialTokenizer->tokenize(path->getString());
@@ -50,6 +54,8 @@ void Parser::parseMaterialLibrary(String *path) {
 	delete materialTokenizer;
 }
 
+// Parse camera.txt file
+// creates new camera
 Camera Parser::parseConfig(const char *path) {
 	configTokenizer = new Tokenizer();
 	configTokenizer->tokenize(path);
@@ -72,6 +78,8 @@ Camera Parser::parseConfig(const char *path) {
 	return camera;
 }
 
+// Find material in material list created from material parser
+// returns material to use for the object
 Material *Parser::findMaterial(String *material) {
 	Node *node = materials.head;
 	while (node) {
@@ -81,12 +89,19 @@ Material *Parser::findMaterial(String *material) {
 	return NULL;
 }
 
+// get all the triangles created by the parser
+// only call after parse is complete
 List *Parser::getFaces() const {return faces;}
 
+// get the bounding box surounding the object
+// only call after parse is complete
 BoundingBox *Parser::getAABB() const {
 	return new BoundingBox(bbx1, bbx0, bby1, bby0, bbz1, bbz0);
 }
 
+// Parse f token in .obj file
+// creates new triangle
+// handles three possible configurations v, v/t, v/vn/t
 void Parser::parse_f() {
 	int v1, v2, v3, n1, n2, n3, t1, t2, t3;
 	String *token;
@@ -213,6 +228,7 @@ void Parser::parse_f() {
 	}
 }
 
+// Parse v token in .obj file
 void Parser::parse_v() {
 	Vector *vector = new Vector();
 	vector->x = tokenizer->nextToken()->toFloat();
@@ -228,6 +244,7 @@ void Parser::parse_v() {
 	tokenizer->nextToken();
 }
 
+// Parse vn token in .obj file
 void Parser::parse_vn() {
 	Vector *vector = new Vector();
 	vector->x = tokenizer->nextToken()->toFloat();
@@ -237,6 +254,8 @@ void Parser::parse_vn() {
 	tokenizer->nextToken();
 }
 
+// Parse vt tokein in .obj file
+// adds to texture vertex list
 void Parser::parse_vt() {
 	Vector *vector = new Vector();
 	vector->x = tokenizer->nextToken()->toFloat();
@@ -245,15 +264,22 @@ void Parser::parse_vt() {
 	tokenizer->nextToken();
 }
 
+// Parse g token in .obj file
+// ignored
 void Parser::parse_g() {
 	if (*tokenizer->nextToken() != '\n') tokenizer->nextToken();
 }
 
+// Parse usemtl token in .obj file
+// gets material to use from token argument
+// puts material on the stack
 void Parser::parse_usemtl() {
 	material = *findMaterial(tokenizer->nextToken());
 	tokenizer->nextToken();
 }
 
+// Parse Ka token in .mtl file
+// sets the Ka(ambient) value of the material being created
 void Parser::parse_Ka() {
 	Color color;
 	color.setRed(materialTokenizer->nextToken()->toFloat()); 
@@ -263,6 +289,8 @@ void Parser::parse_Ka() {
 	materialTokenizer->nextToken();
 }
 
+// Parse Kd token in .mtl file
+// sets the Kd(diffuse) value of the material being created
 void Parser::parse_Kd() {
 	Color color;
 	color.setRed(materialTokenizer->nextToken()->toFloat()); 
@@ -272,6 +300,8 @@ void Parser::parse_Kd() {
 	materialTokenizer->nextToken();
 }
 
+// Parse Ks(specular) value of the material being created
+// .mtl file
 void Parser::parse_Ks() {
 	Color color;
 	color.setRed(materialTokenizer->nextToken()->toFloat()); 
@@ -281,49 +311,76 @@ void Parser::parse_Ks() {
 	materialTokenizer->nextToken();
 }
 
+// Parse Ns(specular exponent) value of the material being created
+// .mtl file
 void Parser::parse_Ns() {
 	((Material *)materials.tail->data)->specularExponent = materialTokenizer->nextToken()->toInt();
 	materialTokenizer->nextToken();
 }
 
+// Parse newmtl token
+// creates a new material
+// name comes from token argument
+// .mtl file
 void Parser::parse_newmtl() {
 	materials.add(new Material(*materialTokenizer->nextToken()));
 	materialTokenizer->nextToken();
 }
 
+// Parse illum token
+// sets the shading model of the material being created
+// .mtl file
 void Parser::parse_illum() {
 	((Material *)materials.tail->data)->shadingModel = materialTokenizer->nextToken()->toInt();
 	materialTokenizer->nextToken();
 }
 
+// Parse mtllib token
+// sets the material library to parse
+// .obj file
 void Parser::parse_mtllib() { 
 	parseMaterialLibrary(tokenizer->nextToken());
 	tokenizer->nextToken();
 }
 
+// Parse map_Ka
+// *funcionality may be removed
+// .mtl file
 void Parser::parse_map_Ka() {
 	Image image;
 	((Material *)materials.tail->data)->ambientTexture = image.readImage(*materialTokenizer->nextToken());
 	materialTokenizer->nextToken();
 }
 
+// Parse map_Kd token
+// creates and adds texture to material
+// .mtl file
 void Parser::parse_map_Kd() {
 	Image image;
 	((Material *)materials.tail->data)->diffuseTexture = image.readImage(*materialTokenizer->nextToken());
 	materialTokenizer->nextToken();
 }
 
+// Parse map_Ks
+// *funcionality may be removed
+// .mtl file
 void Parser::parse_map_Ks() {
 	Image image;
 	((Material *)materials.tail->data)->specularTexture = image.readImage(*materialTokenizer->nextToken());
 	materialTokenizer->nextToken();
 }
 
+// Parse d token
+// sets the alpha value of the texture map
+// .mtl file
 void Parser::parse_d() {
 	material.textureAlpha = materialTokenizer->nextToken()->toFloat();
 	materialTokenizer->nextToken();
 }
 
+// Parse viewpoint token
+// sets the viewpoint of the camera
+// camera.txt file
 void Parser::parse_viewpoint() {
 	Vector vector;
 	vector.x = configTokenizer->nextToken()->toFloat();
@@ -333,6 +390,9 @@ void Parser::parse_viewpoint() {
 	configTokenizer->nextToken();
 }
 
+// Parse dir token
+// sets the direction of the camera being created
+// camera.txt file
 void Parser::parse_dir() {
 	Vector vector;
 	vector.x = configTokenizer->nextToken()->toFloat();
@@ -342,6 +402,9 @@ void Parser::parse_dir() {
 	configTokenizer->nextToken();
 }
 
+// Parse v_up token
+// sets the up direction of the camera being created
+// camera.txt file
 void Parser::parse_v_up() {
 	Vector vector;
 	vector.x = configTokenizer->nextToken()->toFloat();
@@ -351,32 +414,51 @@ void Parser::parse_v_up() {
 	configTokenizer->nextToken();
 }
 
+// Parse the f token
+// sets the focal length of the camera being created
+// camera.txt file
 void Parser::parse_fl() {
 	camera.setFocalLength(configTokenizer->nextToken()->toFloat());
 	configTokenizer->nextToken();	
 }
 
+// Parse aspectratio token
+// sets the aspect ratio of the camera being created
+// camera.txt file
 void Parser::parse_aspectratio() {
 	camera.setAspectRatio(configTokenizer->nextToken()->toFloat());
 	configTokenizer->nextToken();
 }
 
+// Parse the screenwidth token
+// sets the screenwidth of the camera being created
+// camera.txt file
 void Parser::parse_screenwidth() {
 	camera.setScreenWidth(configTokenizer->nextToken()->toFloat());
 	configTokenizer->nextToken();
 }
 
+// Parse width token
+// sets the width of the screen (in pixels) of the camera being created
+// camera.txt file
 void Parser::parse_width() {
 	camera.setScreenPixelWidth(configTokenizer->nextToken()->toInt());
 	configTokenizer->nextToken();
 }
 
+// Parse viewmode token
+// sets the viewmode of the camera being created
+// camera.txt file
 void Parser::parse_viewmode() {
 	if (*configTokenizer->nextToken() == "perspective") camera.setProjectionView();
 	else configTokenizer->nextToken();
 	configTokenizer->nextToken();
 }
 
+// Parse antialiasing token
+// sets wether to use antialiasing or not
+// also determines how many samples to use
+// camera.txt file
 void Parser::parse_antialiasing() {
 	if (*configTokenizer->nextToken() == "true") {
 		camera.enableAntialiasing();
@@ -388,31 +470,43 @@ void Parser::parse_antialiasing() {
 	configTokenizer->nextToken();
 }
 
+// Parse s token
+// ignored
+// .obj file
 void Parser::parse_s() {
 	String *token = tokenizer->nextToken();
 	while (*token != '\n') token = tokenizer->nextToken();
 }
 
+// Parse l token
+// ignored
+// .obj file
 void Parser::parse_l() {
 	String *token = tokenizer->nextToken();
 	while (*token != '\n') token = tokenizer->nextToken();
 }
 
+// Parse p token
+// ignored
+// .obj file
 void Parser::parse_p() {
 	String *token = tokenizer->nextToken();
 	while (*token != '\n') token = tokenizer->nextToken();
 }
 
+// Parse comment in camera.txt file
 void Parser::parse_config_comment() {
 	String *token = configTokenizer->nextToken();
 	while (*token != '\n') token = configTokenizer->nextToken();
 }
 
+// Parse comment in .mtl file
 void Parser::parse_material_comment() {
 	String *token = materialTokenizer->nextToken();
 	while (*token != '\n') token = materialTokenizer->nextToken();
 }
 
+// Parse comment in .obj file
 void Parser::parse_comment() {
 	String *token = tokenizer->nextToken();
 	while (*token != '\n') token = tokenizer->nextToken();
