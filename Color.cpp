@@ -3,10 +3,10 @@
 Color::Color() : red(0), green(0), blue(0), alpha(1) {}
 
 Color::Color(const RGBApixel *pixel) : 
-	red(pixel->red / 255), 
-	green(pixel->green / 255), 
-	blue(pixel->blue / 255),
-	alpha(pixel->alpha / 255) {}
+	red(pixel->red / (double)255), 
+	green(pixel->green / (double)255), 
+	blue(pixel->blue / (double)255),
+	alpha(pixel->alpha / (double)255) {}
 
 Color::Color(const double red, const double green, const double blue) : 
 	red(red<1?red:1), 
@@ -32,7 +32,7 @@ Color::Color(const enum Colors color) : red(0), green(0), blue(0), alpha(1) {
          green = 1;
          break;
       case BLUE:
-         blue = 1;
+         blue = 0.1;
          break;
       case ORANGE:
          red = 1; green = 0.64705882;
@@ -62,7 +62,7 @@ const RGBApixel Color::toPixel() const {
     pixel.red = red * 255;
     pixel.green = green * 255;
     pixel.blue = blue * 255;
-    pixel.alpha = 255;
+    pixel.alpha = alpha * 255;
     return pixel;
 }
 

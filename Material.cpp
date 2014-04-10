@@ -49,10 +49,10 @@ Material::Material(const enum Materials material) :
          diffusionCoefficient = Color(0.1, 0.1, 0.1);
          break;
        case BLUE_GLASS:
-      	this->color = Color(BLUE);
-         specularCoefficient = Color(WHITE); 
+      	this->color = Color(0, 0, 0);
+         specularCoefficient = Color(0, 0, 0.5); 
    	 	specularExponent = 80; 
-         diffusionCoefficient = Color(0.1, 0.1, 0.1);
+         diffusionCoefficient = Color(0, 0, 0.2);
          break;
        case PURPLE_GLASS:
       	this->color = Color(PURPLE);
@@ -101,7 +101,6 @@ Material::Material(const enum Materials material) :
          specularCoefficient = Color(0.8, 0.8, 0.8); 
          specularExponent = 20; 
          diffusionCoefficient = Color(0.7, 0.7, 0.7);
-         break;
    }
 }
 

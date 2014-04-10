@@ -2,7 +2,7 @@ CC = g++
 C = cpp
 H = h
 
-PROJECT = raytrace
+PROJECT = objtrace
 
 CFLAGS = -g -O4 -Wall `Magick++-config --cppflags`
 LFLAGS = -g -O4 -Wall `Magick++-config --ldflags`

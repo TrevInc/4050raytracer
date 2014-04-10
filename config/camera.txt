@@ -1,0 +1,8 @@
+viewpoint 5 0 5
+dir -1 0 -1
+v_up 0 1 0
+f 0.5
+aspectratio 1.25
+screenwidth 0.5
+width 1024
+viewmode perspective

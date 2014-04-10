@@ -47,7 +47,7 @@ inline HitData *Camera::trace(const Vector *ray, const Vector *pixelPosition) {
 inline Color Camera::shade(const HitData *hitData) {
    Shape *shape;
    Light *light;
-   Color color, reflected;
+   Color color, reflected, black;
    HitData *hit, *shadow;
    Node *node;
    Vector lightRay;
@@ -60,14 +60,22 @@ inline Color Camera::shade(const HitData *hitData) {
          lightRay = -light->getLightRay(&hitData->hitPoint);
          shadow = trace(&lightRay, &hitData->hitPoint);
          if (!shadow) {
-         	color += shape->shade(hitData, light) + ambientLight;	
+         	if (shape->material.ambientTexture) {
+         		color += shape->shade(hitData, light) + ambientLight * shape->material.ambientTexture->getPixelAt(
+         			hitData->textureCoordinate.x * shape->material.ambientTexture->getRowSize(),
+         			hitData->textureCoordinate.y * shape->material.ambientTexture->getRowSize());
+         	} else color += shape->shade(hitData, light) + ambientLight;
          } else {
-         	color += shape->material.color + ambientLight;
+         	if (shape->material.ambientTexture) {
+         		color += ambientLight * shape->material.ambientTexture->getPixelAt(
+         			hitData->textureCoordinate.x * shape->material.ambientTexture->getRowSize(),
+         			hitData->textureCoordinate.y * shape->material.ambientTexture->getRowSize());
+         	} else color += shape->material.color + ambientLight;
          	delete shadow;
          }
          node = node->next;
       }
-      if (shape->material.specularCoefficient != Color(BLACK)) {
+      if (shape->material.specularCoefficient != black) {
       	hit = trace(&hitData->reflectionRay, &hitData->hitPoint);
    		color += shade(hit) * shape->material.specularCoefficient;
    		delete hit;
@@ -151,7 +159,7 @@ void Camera::disableAntialiasing() {antialiasing = false;}
 
 void Camera::setRecursionLevel(const unsigned short int recursionLevel) {this->recursionLevel = recursionLevel;}
 
-void Camera::setAntialiasingLevel(const unsigned short int level) {level < 1 ? this->level = 1 : this->level = level;}
+void Camera::setAntialiasingLevel(const unsigned short int level) {level<1?this->level=1:this->level=level;}
 
 void Camera::addAABB(BoundingBox *aabb) {this->aabb = aabb;}
 

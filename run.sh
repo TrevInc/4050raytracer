@@ -1,4 +1,4 @@
 #!/bin/bash
 
-time ./raytrace tetrahedron.obj
+time ./objtrace tetrahedron.obj
 display "images/out.png"

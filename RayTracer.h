@@ -17,6 +17,7 @@ class RayTracer {
         ~RayTracer();
         void addShape(const Shape *shape);
         void addLight(const Light *light);
+        void loadObject(String *path);
         void save(const char *path);
         void render();
 };

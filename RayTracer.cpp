@@ -19,6 +19,11 @@ void RayTracer::save(const char *path) {
 	image.writeImage(path, pixmap);
 }
 
+void RayTracer::loadObject(String *path) {
+	parser.parse(path->getString());
+
+}
+
 void RayTracer::render() {
 	camera.setShapes(scene.getShapeList());
    camera.setLights(scene.getLightList());

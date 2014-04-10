@@ -1,0 +1,10 @@
+#include "Parser.h"
+
+int main() {
+	//Parser parser = Parser();
+	//parser.parse("tetrahedron.obj");
+	Image image;
+	Pixmap *pixmap;
+	pixmap = image.readImage("brazil_flag.png");
+	image.writeImage("out.png", pixmap);
+}
