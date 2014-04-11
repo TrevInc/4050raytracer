@@ -9,16 +9,8 @@ class Light : public ColoredObject {
       Vector location;
       double intensity;
    public:
-      Light(
-      	String name, 
-      	const Color color, 
-      	const Vector location, 
-      	const double intensity);
-      Light(
-      	String name, 
-      	const enum Colors color, 
-      	const Vector location, 
-      	const double intensity);
+      Light(String name, const Color color, const Vector location, const double intensity);
+      Light(String name, const enum Colors color, const Vector location, const double intensity);
       void setLocation(const Vector location);
       const Vector getLocation() const;
       void setIntensity(const double intensity);

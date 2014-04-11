@@ -6,31 +6,21 @@
 #include "Pixmap.h"
 #include "Color.h"
 #include "HitData.h"
-#include "Object.h"
 #include "List.h"
 #include "Shape.h"
-#include "BoundingBox.h"
 #include <iostream>
 
 #define MAX_DOUBLE 100000000000000000
 
-class Camera : public Object {
+class Camera {
    private:
-      double screenWidth; 
-      double aspectRatio;
-      double focalLength;
+      double screenWidth, aspectRatio, focalLength;
       int screenPixelWidth;
-      Vector viewPoint; 
-      Vector direction;
-      Vector up;
-      bool projectionView;
-      bool antialiasing;
-      unsigned short int level;
-      unsigned short int recursionLevel;
-      const List *shapes;
-      const List *lights;
+      Vector viewPoint, direction, up;
+      bool projectionView, antialiasing;
+      unsigned short int antialiasingLevel, recursionLevel;
+      const List *shapes, *lights;
       Color ambientLight;
-      BoundingBox *aabb;
       HitData *trace(const Vector *ray, const Vector *pixelPosition);
       Color shade(const HitData *hitData);
       double randf(double min, double max);
@@ -39,22 +29,20 @@ class Camera : public Object {
       Pixmap *captureImage();
       void setShapes(const List *shapes);
       void setLights(const List *lights);
-      void setAmbientLight(const Color ambientLight);
-      void setAmbientLight(const enum Colors ambientLight);
-      void setScreenWidth(const double screenWidth);
-      void setScreenPixelWidth(const int screenPixelWidth);
-      void setAspectRatio(const double aspectRatio);
+      void setAmbientLight(const Color color);
+      void setScreenWidth(const double width);
+      void setScreenPixelWidth(const int pixels);
+      void setAspectRatio(const double ratio);
       void setFocalLength(const double focalLength);
       void setViewPoint(const Vector viewPoint);
-      void setDirection(const Vector direction);
+      void setViewDirection(const Vector direction);
       void setUpDirection(const Vector up);
       void setProjectionView();
       void setOrthographicView();
       void enableAntialiasing();
       void disableAntialiasing();
-      void setRecursionLevel(const unsigned short int recursionLevel);
-      void setAntialiasingLevel(const unsigned short int level);
-      void addAABB(BoundingBox *aabb);
+      void setRecursionLevel(const int level);
+      void setAntialiasingLevel(const int level);
 };
 
 #endif

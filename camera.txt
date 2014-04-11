@@ -1,8 +1,0 @@
-viewpoint -2.5 2.5 7
-dir 0 0 -1
-v_up 0 1 0
-f 0.5
-aspectratio 1.25
-screenwidth 0.5
-width 250
-viewmode perspective

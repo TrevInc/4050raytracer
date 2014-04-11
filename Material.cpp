@@ -2,33 +2,33 @@
 
 Material::Material() :
 		ColoredObject(Color(WHITE)),
-		specularCoefficient(Color(BLACK)), 
-		specularExponent(0), 
+		specularCoefficient(Color(BLACK)),
 		diffusionCoefficient(Color(WHITE)),
+		specularExponent(0),
+		textureAlpha(1),
 		shadingModel(2),
 		ambientTexture(NULL),
 		diffuseTexture(NULL),
-		specularTexture(NULL),
-		textureAlpha(1) {}
+		specularTexture(NULL) {}
 
 Material::Material(String name) :
 		ColoredObject(name, Color(WHITE)),
-		specularCoefficient(Color(BLACK)), 
-		specularExponent(0), 
-		diffusionCoefficient(Color(WHITE)),
+		specularCoefficient(Color(BLACK)),
+		diffusionCoefficient(Color(WHITE)), 
+		specularExponent(0),
+		textureAlpha(1),
 		shadingModel(2),
 		ambientTexture(NULL),
 		diffuseTexture(NULL),
-		specularTexture(NULL),
-		textureAlpha(1) {}
+		specularTexture(NULL) {}
       
 Material::Material(const enum Materials material) : 
-		ColoredObject(), 		
+		ColoredObject(),
+		textureAlpha(1),		
 		shadingModel(2),
 		ambientTexture(NULL),
 		diffuseTexture(NULL),
-		specularTexture(NULL),
-		textureAlpha(1) {
+		specularTexture(NULL){
    switch (material) {
       case CHROME:
       	this->color = Color(WHITE);

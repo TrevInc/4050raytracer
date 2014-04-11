@@ -4,8 +4,8 @@ H = h
 
 PROJECT = objtrace
 
-CFLAGS = -g -O4 -Wall `Magick++-config --cppflags`
-LFLAGS = -g -O4 -Wall `Magick++-config --ldflags`
+CFLAGS = -O4 -Wall `Magick++-config --cppflags`
+LFLAGS = -O4 -Wall `Magick++-config --ldflags`
 
 ifeq ("$(shell uname)", "Darwin")
   LDFLAGS = -framework Foundation -framework GLUT -framework OpenGL -lm
@@ -15,8 +15,7 @@ else
   endif
 endif
 
-HFILES = rayTracer.${H}\
-			Object.${H}\
+HFILES = Object.${H}\
 			ColoredObject.${H}\
 			RGBApixel.${H}\
 			Pixmap.${H}\

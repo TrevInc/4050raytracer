@@ -1,7 +1,6 @@
 #include "Camera.h"
 
-Camera::Camera() :
-	Object(), 
+Camera::Camera() : 
    screenWidth(0.5), 
    aspectRatio(1.25), 
    focalLength(0.5), 
@@ -11,12 +10,11 @@ Camera::Camera() :
    up(Vector(0, 1, 0)), 
    projectionView(true), 
    antialiasing(false),
-   level(1),
+   antialiasingLevel(1),
    recursionLevel(5),
    shapes(NULL),
    lights(NULL),
-   ambientLight(Color(BLACK)),
-   aabb(NULL) {}
+   ambientLight(Color(BLACK)) {}
       
 inline HitData *Camera::trace(const Vector *ray, const Vector *pixelPosition) {
    List hitShapes;
@@ -64,13 +62,13 @@ inline Color Camera::shade(const HitData *hitData) {
          		color += shape->shade(hitData, light) + ambientLight * shape->material.ambientTexture->getPixelAt(
          			hitData->textureCoordinate.x * shape->material.ambientTexture->getRowSize(),
          			hitData->textureCoordinate.y * shape->material.ambientTexture->getRowSize());
-         	} else color += shape->shade(hitData, light) + ambientLight;
+         	} else color += shape->shade(hitData, light);
          } else {
          	if (shape->material.ambientTexture) {
          		color += ambientLight * shape->material.ambientTexture->getPixelAt(
          			hitData->textureCoordinate.x * shape->material.ambientTexture->getRowSize(),
          			hitData->textureCoordinate.y * shape->material.ambientTexture->getRowSize());
-         	} else color += shape->material.color + ambientLight;
+         	} else color += shape->material.color;
          	delete shadow;
          }
          node = node->next;
@@ -80,6 +78,7 @@ inline Color Camera::shade(const HitData *hitData) {
    		color += shade(hit) * shape->material.specularCoefficient;
    		delete hit;
    	}
+   	color += ambientLight;
    }
    depth = 0;
    return color;
@@ -103,22 +102,20 @@ Pixmap *Camera::captureImage() {
    for (int i = 0; i < screenPixelHeight; ++i) {
       for (int j = 0; j < screenPixelWidth; ++j) {
          r = 0, g = 0, b = 0;
-         for (int k = 0; k < level; ++k) {
+         for (int k = 0; k < antialiasingLevel; ++k) {
          	pixelPosition = screenCenter 
          		+ (u_x * (centerWidth + pixelWidth * (j + (antialiasing?randf(0, 1):0.5)))) 
          		+ (u_y * (centerHeight + pixelHeight * (i + (antialiasing?randf(0, 1):0.5))));
          	if (projectionView) ray = (pixelPosition - viewPoint).normalize();
          	else ray = direction;
-				if (aabb->intersect(&ray, &pixelPosition)) {
-					hitData = trace(&ray, &pixelPosition);
-        			color = shade(hitData);
-        			if (hitData) delete hitData;
-        		} else color = Color(BLACK);
+				hitData = trace(&ray, &pixelPosition);
+        		color = shade(hitData);
+        		if (hitData) delete hitData;
         		r += color.getRed();
         		g += color.getGreen();
         		b += color.getBlue();
          }
-         color = Color(r / level, g / level, b / level);
+         color = Color(r / antialiasingLevel, g / antialiasingLevel, b / antialiasingLevel);
          pixmap->setPixelAt(j, i, color.toPixel());	
       }
       std::cout << "%" <<  (int)(((double)i/(double)screenPixelWidth) * 100.0 + 20) << std::endl;
@@ -127,43 +124,71 @@ Pixmap *Camera::captureImage() {
    return pixmap;
 }
 
-void Camera::setShapes(const List *shapes) {this->shapes = shapes;}
+void Camera::setShapes(const List *shapes) {
+	this->shapes = shapes;
+}
 
-void Camera::setLights(const List *lights) {this->lights = lights;}
+void Camera::setLights(const List *lights) {
+	this->lights = lights;
+}
 
-void Camera::setAmbientLight(const Color ambientLight) {this->ambientLight = ambientLight;}
+void Camera::setAmbientLight(const Color color) {
+	ambientLight = color;
+}
 
-void Camera::setAmbientLight(const enum Colors ambientLight) {this->ambientLight = Color(ambientLight);}
+void Camera::setScreenWidth(const double width) {
+	screenWidth = width;
+}
 
-void Camera::setScreenWidth(const double screenWidth) {this->screenWidth = screenWidth;}
+void Camera::setScreenPixelWidth(const int pixels) {
+	screenPixelWidth = pixels;
+}
 
-void Camera::setScreenPixelWidth(const int screenPixelWidth) {this->screenPixelWidth = screenPixelWidth;}
+void Camera::setAspectRatio(const double ratio) {
+	aspectRatio = ratio;
+}
 
-void Camera::setAspectRatio(const double aspectRatio) {this->aspectRatio = aspectRatio;}
+void Camera::setFocalLength(const double focalLength) {
+	this->focalLength = focalLength;
+}
 
-void Camera::setFocalLength(const double focalLength) {this->focalLength = focalLength;}
+void Camera::setViewPoint(const Vector viewPoint) {
+	this->viewPoint = viewPoint;
+}
 
-void Camera::setViewPoint(const Vector viewPoint) {this->viewPoint = viewPoint;}
+void Camera::setViewDirection(const Vector direction) {
+	this->direction = direction.normalize();
+}
 
-void Camera::setDirection(const Vector direction) {this->direction = direction;}
+void Camera::setUpDirection(const Vector up) {
+	this->up = up.normalize();
+}
 
-void Camera::setUpDirection(const Vector up) {this->up = up;}
+void Camera::setProjectionView() {
+	projectionView = true;
+}
 
-void Camera::setProjectionView() {projectionView = true;}
+void Camera::setOrthographicView() {
+	projectionView = false;
+}
 
-void Camera::setOrthographicView() {projectionView = false;}
+void Camera::enableAntialiasing() {
+	antialiasing = true;
+}
 
-void Camera::enableAntialiasing() {antialiasing = true;}
+void Camera::disableAntialiasing() {
+	antialiasing = false;
+}
 
-void Camera::disableAntialiasing() {antialiasing = false;}
+void Camera::setRecursionLevel(const int level) {
+	recursionLevel = level;
+}
 
-void Camera::setRecursionLevel(const unsigned short int recursionLevel) {this->recursionLevel = recursionLevel;}
-
-void Camera::setAntialiasingLevel(const unsigned short int level) {level<1?this->level=1:this->level=level;}
-
-void Camera::addAABB(BoundingBox *aabb) {this->aabb = aabb;}
+void Camera::setAntialiasingLevel(const int level) {
+	antialiasingLevel < 1 ? antialiasingLevel = 1 : antialiasingLevel = level;
+}
 
 double Camera::randf(double min, double max) {
-    double f = (double)rand() / RAND_MAX;
+    double f = static_cast<double>(rand()) / RAND_MAX;
     return min + f * (max - min);
 }

@@ -2,10 +2,7 @@
 
 Vector::Vector() : x(), y(), z() {}
 
-Vector::Vector(const double x, const double y, const double z) :  
-	x(x), 
-	y(y), 
-	z(z) {}
+Vector::Vector(const double x, const double y, const double z) :  x(x), y(y), z(z) {}
 
 Vector Vector::operator+(const Vector& v1) const {
     return Vector(x + v1.x, y + v1.y, z + v1.z);

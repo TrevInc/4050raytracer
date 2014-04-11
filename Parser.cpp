@@ -1,10 +1,15 @@
 #include "Parser.h"
 
-Parser::Parser() : faces(new List()), bbx0(-100000), bbx1(100000), bby0(-100000), bby1(100000), bbz0(-100000), bbz1(100000) {}
+Parser::Parser() : 
+	faces(new List()), 
+	bbx0(-100000), 
+	bbx1(100000), 
+	bby0(-100000), 
+	bby1(100000), 
+	bbz0(-100000), 
+	bbz1(100000) {}
 
-Parser::~Parser() {
-	delete faces;
-}
+Parser::~Parser() {delete faces;}
 
 // Parse .obj file
 // creates new shape
@@ -52,30 +57,6 @@ void Parser::parseMaterialLibrary(String *path) {
 		token = materialTokenizer->nextToken();
 	}
 	delete materialTokenizer;
-}
-
-// Parse camera.txt file
-// creates new camera
-Camera Parser::parseConfig(const char *path) {
-	configTokenizer = new Tokenizer();
-	configTokenizer->tokenize(path);
-	String *token = configTokenizer->nextToken();
-	while (token != NULL) {
-		if (*token == "viewpoint") parse_viewpoint();
-		else if (*token == "dir") parse_dir();
-		else if (*token == "v_up") parse_v_up();
-		else if (*token == "f") parse_fl();
-		else if (*token == "aspectratio") parse_aspectratio();
-		else if (*token == "screenwidth") parse_screenwidth();
-		else if (*token == "width") parse_width();
-		else if (*token == "viewmode") parse_viewmode();
-		else if (*token == "antialiasing") parse_antialiasing();
-		else if (*token == "#") parse_config_comment();
-		else {}
-		token = configTokenizer->nextToken();
-	}
-	delete configTokenizer;
-	return camera;
 }
 
 // Find material in material list created from material parser
@@ -378,98 +359,6 @@ void Parser::parse_d() {
 	materialTokenizer->nextToken();
 }
 
-// Parse viewpoint token
-// sets the viewpoint of the camera
-// camera.txt file
-void Parser::parse_viewpoint() {
-	Vector vector;
-	vector.x = configTokenizer->nextToken()->toFloat();
-	vector.y = configTokenizer->nextToken()->toFloat();
-	vector.z = configTokenizer->nextToken()->toFloat();
-	camera.setViewPoint(vector);
-	configTokenizer->nextToken();
-}
-
-// Parse dir token
-// sets the direction of the camera being created
-// camera.txt file
-void Parser::parse_dir() {
-	Vector vector;
-	vector.x = configTokenizer->nextToken()->toFloat();
-	vector.y = configTokenizer->nextToken()->toFloat();
-	vector.z = configTokenizer->nextToken()->toFloat();
-	camera.setDirection(vector);
-	configTokenizer->nextToken();
-}
-
-// Parse v_up token
-// sets the up direction of the camera being created
-// camera.txt file
-void Parser::parse_v_up() {
-	Vector vector;
-	vector.x = configTokenizer->nextToken()->toFloat();
-	vector.y = configTokenizer->nextToken()->toFloat();
-	vector.z = configTokenizer->nextToken()->toFloat();
-	camera.setUpDirection(vector);
-	configTokenizer->nextToken();
-}
-
-// Parse the f token
-// sets the focal length of the camera being created
-// camera.txt file
-void Parser::parse_fl() {
-	camera.setFocalLength(configTokenizer->nextToken()->toFloat());
-	configTokenizer->nextToken();	
-}
-
-// Parse aspectratio token
-// sets the aspect ratio of the camera being created
-// camera.txt file
-void Parser::parse_aspectratio() {
-	camera.setAspectRatio(configTokenizer->nextToken()->toFloat());
-	configTokenizer->nextToken();
-}
-
-// Parse the screenwidth token
-// sets the screenwidth of the camera being created
-// camera.txt file
-void Parser::parse_screenwidth() {
-	camera.setScreenWidth(configTokenizer->nextToken()->toFloat());
-	configTokenizer->nextToken();
-}
-
-// Parse width token
-// sets the width of the screen (in pixels) of the camera being created
-// camera.txt file
-void Parser::parse_width() {
-	camera.setScreenPixelWidth(configTokenizer->nextToken()->toInt());
-	configTokenizer->nextToken();
-}
-
-// Parse viewmode token
-// sets the viewmode of the camera being created
-// camera.txt file
-void Parser::parse_viewmode() {
-	if (*configTokenizer->nextToken() == "perspective") camera.setProjectionView();
-	else configTokenizer->nextToken();
-	configTokenizer->nextToken();
-}
-
-// Parse antialiasing token
-// sets wether to use antialiasing or not
-// also determines how many samples to use
-// camera.txt file
-void Parser::parse_antialiasing() {
-	if (*configTokenizer->nextToken() == "true") {
-		camera.enableAntialiasing();
-		configTokenizer->nextToken();
-		if (*configTokenizer->nextToken() == "samples") {
-			camera.setAntialiasingLevel(configTokenizer->nextToken()->toInt());
-		}
-	}
-	configTokenizer->nextToken();
-}
-
 // Parse s token
 // ignored
 // .obj file
@@ -492,12 +381,6 @@ void Parser::parse_l() {
 void Parser::parse_p() {
 	String *token = tokenizer->nextToken();
 	while (*token != '\n') token = tokenizer->nextToken();
-}
-
-// Parse comment in camera.txt file
-void Parser::parse_config_comment() {
-	String *token = configTokenizer->nextToken();
-	while (*token != '\n') token = configTokenizer->nextToken();
 }
 
 // Parse comment in .mtl file

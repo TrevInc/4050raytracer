@@ -1,6 +1,4 @@
 #include "Node.h"
 
-Node::Node(const void *data) : 
-	data(data), 
-	next(NULL) {}
+Node::Node(const void *data) : data(data), next(NULL) {}
 

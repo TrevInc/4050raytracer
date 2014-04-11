@@ -7,12 +7,10 @@
 
 class Material : public ColoredObject {
    public:
-      Color specularCoefficient;
-      double specularExponent;
-      Color diffusionCoefficient;
-      short unsigned int shadingModel;
+      Color specularCoefficient, diffusionCoefficient;;
+      double specularExponent, textureAlpha;
+      short int shadingModel;
       Pixmap *ambientTexture, *diffuseTexture, *specularTexture;
-      double textureAlpha;
       Material();
       Material(String name);
       Material(const enum Materials material);

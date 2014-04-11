@@ -66,13 +66,21 @@ const RGBApixel Color::toPixel() const {
     return pixel;
 }
 
-void Color::setRed(const double red) {red<1?this->red=red:this->red=1;}
+void Color::setRed(const double red) {
+	red < 1 ? this->red = red : this->red = 1;
+}
 
-void Color::setGreen(const double green) {green<1?this->green=green:this->green=1;}
+void Color::setGreen(const double green) {
+	green < 1 ? this->green = green : this->green = 1;
+}
 
-void Color::setBlue(const double blue) {blue<1?this->blue=blue:this->blue=1;}
+void Color::setBlue(const double blue) {
+	blue < 1 ? this->blue = blue : this->blue = 1;
+}
 
-void Color::setAlpha(const double alpha) {alpha<1?this->alpha=blue:this->alpha=1;}
+void Color::setAlpha(const double alpha) {
+	alpha < 1 ? this->alpha = blue : this->alpha = 1;
+}
 
 const double Color::getRed() const {return red;}
 
