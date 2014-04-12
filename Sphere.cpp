@@ -9,15 +9,6 @@ Sphere::Sphere(
 		radius(radius), 
 		center(center) {}
 
-Sphere::Sphere(
-	String name,  
-	const enum Materials material, 
-	const double radius, 
-	const Vector center) : 
-		Shape(name, material), 
-		radius(radius), 
-		center(center) {}
-
 inline HitData *Sphere::hit(const Vector *ray, const Vector *pixelPosition) const {
     double t = *ray * (center - *pixelPosition);
     if (t < 0) return NULL;

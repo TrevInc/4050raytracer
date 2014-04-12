@@ -12,14 +12,6 @@ class SpotLight : public DirectionalLight {
 	public:
 		SpotLight(
 			String name, 
-			const enum Colors color,
-			const Vector location, 
-			const Vector direction, 
-			const double intensity,
-			const double lightShade,
-			const double fallOffIntensity);
-		SpotLight(
-			String name, 
 			const Color color, 
 			const Vector location,
 			const Vector direction, 

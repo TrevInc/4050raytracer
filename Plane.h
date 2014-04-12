@@ -10,17 +10,10 @@ class Plane : public Shape {
       Vector location;
       Vector orientation;
    public:
-   	Plane(const Material material);
    	Plane(String name, const Material material);
-   	Plane(String name, const enum Materials material);
       Plane(
       	String name, 
       	const Material material, 
-      	const Vector orientation, 
-      	const Vector location);
-      Plane(
-      	String name,  
-      	const enum Materials material, 
       	const Vector orientation, 
       	const Vector location);
       const Vector getOrientation() const;

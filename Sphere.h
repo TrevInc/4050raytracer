@@ -14,11 +14,6 @@ class Sphere : public Shape {
       	const Material material, 
       	const double radius, 
       	const Vector center);
-      Sphere(
-      	String name, 
-      	const enum Materials material, 
-      	const double radius, 
-      	const Vector center);
       virtual HitData *hit(
       	const Vector *ray, 
       	const Vector *pixelPosition) const;

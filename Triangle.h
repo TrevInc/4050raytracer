@@ -10,12 +10,6 @@ class Triangle : public Plane {
 		double area;
    public:
       Triangle(
-      	String name, 
-      	const enum Materials material, 
-      	const Vector p0, 
-      	const Vector p1, 
-      	const Vector p2);
-      Triangle(
       	String name,  
       	const Material material, 
       	const Vector p0, 

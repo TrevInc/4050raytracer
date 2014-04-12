@@ -1,23 +1,4 @@
 #include "Triangle.h"
-
-Triangle::Triangle(
-	String name,  
-	const enum Materials material, 
-	const Vector p0, 
-	const Vector p1, 
-	const Vector p2) : 
-		Plane(name, material),
-		p0(p0), 
-		p1(p1), 
-		p2(p2), 
-		edge0(p1 - p0), 
-		edge1(p2 - p1), 
-		edge2(p0 - p2),
-		phongShading(false),
-		textureMap(false) {
-			this->location = p0;
-			this->orientation = (edge0 % edge1).normalize();
-		}
 		
 Triangle::Triangle(
 	String name,  
@@ -54,9 +35,9 @@ void Triangle::setTextureVectors(const Vector vt0, const Vector vt1, const Vecto
 }
 		
 inline HitData *Triangle::hit(const Vector *ray, const Vector *pixelPosition) const {	
-	HitData *hitData = Plane::hit(ray, pixelPosition);
+	HitData *hitData(Plane::hit(ray, pixelPosition));
 	if (!hitData) return NULL;
-	Vector hitPoint = hitData->hitPoint;
+	Vector hitPoint(hitData->hitPoint);
 	double g = (edge0 % edge1 * (edge0 % (hitPoint - p0))) / pow((edge0 % edge1).magnitude(), 2);
 	double a = (edge0 % edge1 * (edge1 % (hitPoint - p1))) / pow((edge0 % edge1).magnitude(), 2);
 	double b = (edge0 % edge1 * (edge2 % (hitPoint - p2))) / pow((edge0 % edge1).magnitude(), 2);

@@ -31,15 +31,8 @@ void RayTracer::load(const char *path) {
 }
 
 void RayTracer::render() {
-	camera.setShapes(scene.getShapeList());
-   camera.setLights(scene.getLightList());
+	camera.addScene(&scene);
    pixmap = camera.captureImage();
-}
-
-Pixmap *RayTracer::getPixmap() const {return pixmap;}
-
-void RayTracer::ambientLight(const double r, const double g, const double b) {
-	camera.setAmbientLight(Color(r, g, b));
 }
 
 void RayTracer::aspectRatio(const double ratio) {
@@ -58,16 +51,16 @@ void RayTracer::cameraFocalLength(const double focalLength) {
 	camera.setFocalLength(focalLength);
 }
 
-void RayTracer::cameraViewPoint(const double x, const double y, const double z) {
-	camera.setViewPoint(Vector(x, y, z));
+void RayTracer::cameraViewPoint(const Vector viewPoint) {
+	camera.setViewPoint(viewPoint);
 }
 
-void RayTracer::cameraViewDirection(const double x, const double y, const double z) {
-	camera.setViewDirection(Vector(x, y, z));
+void RayTracer::cameraViewDirection(const Vector direction) {
+	camera.setViewDirection(direction);
 }
 
-void RayTracer::cameraOrientation(const double x, const double y, const double z) {
-	camera.setUpDirection(Vector(x, y, z));
+void RayTracer::cameraOrientation(const Vector orientation) {
+	camera.setUpDirection(orientation);
 }
 
 void RayTracer::enableProjectionView() {
@@ -92,4 +85,8 @@ void RayTracer::recursionLevel(const int level) {
 
 void RayTracer::antialiasingLevel(const int level) {
 	camera.setAntialiasingLevel(level);
+}
+
+void RayTracer::ambientLight(const Color color) {
+	scene.setAmbientLight(color);
 }

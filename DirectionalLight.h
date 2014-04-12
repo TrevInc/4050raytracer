@@ -13,12 +13,6 @@ class DirectionalLight : public Light {
       	const Vector location, 
       	const Vector direction, 
       	const double intensity);
-      DirectionalLight(
-      	String name, 
-      	const enum Colors color, 
-      	const Vector location, 
-      	const Vector direction, 
-      	const double intensity);
       const Vector *getDirection() const;
       void setDirection(const Vector direction);
 };

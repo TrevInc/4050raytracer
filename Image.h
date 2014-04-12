@@ -3,20 +3,12 @@
 
 #include "Magick++.h"
 #include "Pixmap.h"
-#include "Object.h"
 
-#ifdef __APPLE__
-#  include <GLUT/glut.h>
-#else
-#  include <GL/glut.h>
-#endif
-
-class Image : public Object {
+class Image {
    private:
-      Magick::Image *image;
+      Magick::Image image;
    public:
       Image();
-      ~Image();
       Pixmap *readImage(String filePath);
       void writeImage(String filePath, Pixmap *pixmap);
 };

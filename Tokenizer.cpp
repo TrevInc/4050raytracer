@@ -15,7 +15,6 @@ void Tokenizer::tokenize(const char *path) {
 	char line[BUFFER], c;
 	int ndx = 0;
    FILE *file = fopen(path, "r");
-   if (not file) {throw "Could not open file\n"; return;}
    do {
    	c = fgetc(file);
 		switch (c) {

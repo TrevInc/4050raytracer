@@ -8,10 +8,10 @@ CFLAGS = -O4 -Wall `Magick++-config --cppflags`
 LFLAGS = -O4 -Wall `Magick++-config --ldflags`
 
 ifeq ("$(shell uname)", "Darwin")
-  LDFLAGS = -framework Foundation -framework GLUT -framework OpenGL -lm
+  LDFLAGS = -framework Foundation -lm
 else
   ifeq ("$(shell uname)", "Linux")
-    LDFLAGS = -lglut -lGL -lGLU -lMagick++ -lm
+    LDFLAGS = -lMagick++ -lm
   endif
 endif
 
@@ -27,14 +27,12 @@ HFILES = Object.${H}\
 			Sphere.${H}\
 			Vector.${H}\
 			Color.${H}\
-			EnumColors.${H}\
 			Light.${H}\
 			PointLight.${H}\
 			ParallelLight.${H}\
 			SpotLight.${H}\
 			Plane.${H}\
 			Camera.${H}\
-			EnumMaterials.${H}\
 			HitData.${H}\
 			Material.${H}\
 			Parser.${H}\

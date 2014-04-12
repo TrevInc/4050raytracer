@@ -343,12 +343,11 @@ void Parser::parse_map_Kd() {
 }
 
 // Parse map_Ks
-// *funcionality may be removed
+// ignored
 // .mtl file
 void Parser::parse_map_Ks() {
-	Image image;
-	((Material *)materials.tail->data)->specularTexture = image.readImage(*materialTokenizer->nextToken());
-	materialTokenizer->nextToken();
+	String *token = tokenizer->nextToken();
+	while (*token != '\n') token = tokenizer->nextToken();
 }
 
 // Parse d token

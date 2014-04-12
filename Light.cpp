@@ -8,15 +8,6 @@ Light::Light(
 		ColoredObject(name, color), 
 		location(location), 
 		intensity(intensity) {}
-		
-Light::Light(
-	String name, 
-	const enum Colors color, 
-	const Vector location, 
-	const double intensity) : 
-		ColoredObject(name, color), 
-		location(location), 
-		intensity(intensity) {}
 
 const Vector Light::getLocation() const {return location;}
 

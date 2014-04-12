@@ -2,18 +2,6 @@
 
 SpotLight::SpotLight(
 	String name,
-	const enum Colors color,
-	const Vector location,
-	const Vector direction,
-	const double intensity,
-	const double lightShade,
-	const double fallOffIntensity) : 
-		DirectionalLight(name, color, location, direction, intensity), 
-		lightShade(cos(lightShade * PI / 180)), 
-		fallOffIntensity(fallOffIntensity) {}
-
-SpotLight::SpotLight(
-	String name,
 	const Color color,
 	const Vector location,
 	const Vector direction,
