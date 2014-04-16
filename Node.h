@@ -1,7 +1,6 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "Object.h"
 #include <cstddef>
 
 class Node {

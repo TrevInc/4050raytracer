@@ -20,6 +20,7 @@ class Parser {
 		List *faces;
 		Material material;
 		double bbx0, bbx1, bby0, bby1, bbz0, bbz1;
+		int line;
 		void parseMaterialLibrary(String *path);
 		Material *findMaterial(String *material);
 		void parse_v();

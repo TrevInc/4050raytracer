@@ -53,10 +53,10 @@ inline Color Camera::shade(const HitData *hitData) {
          lightRay = -light->getLightRay(&hitData->hitPoint);
          shadow = trace(&lightRay, &hitData->hitPoint);
          if (!shadow) { 
-   			Color lightColor = light->color * light->getIntensity(&hitData->hitPoint);
-				lightRay = light->getLightRay(&hitData->hitPoint);
-   			Vector surfaceNormal = hitData->surfaceNormal;
-   			Material material = shape->material;
+   			Color lightColor(light->color * light->getIntensity(&hitData->hitPoint));
+   			Vector surfaceNormal(hitData->surfaceNormal);
+   			Material material(shape->material);
+   			double lightRayTest(lightRay * surfaceNormal);
    			switch (material.shadingModel) {
    				case 0:
    					color += material.diffusionCoefficient;
@@ -66,45 +66,56 @@ inline Color Camera::shade(const HitData *hitData) {
    						Color textureColor = material.ambientTexture->getPixelAt(
    							(hitData->textureCoordinate.x * material.ambientTexture->getRowSize()), 
    							(hitData->textureCoordinate.y * material.ambientTexture->getColumnSize()));
-   						color += lightColor * textureColor;
-   					} else color += lightColor * material.color;
+   						if (lightRayTest > 0) {
+   							color += lightColor * textureColor + (material.color * ((1 - material.textureAlpha)));
+   						}
+   					} else if (lightRayTest > 0) color += lightColor * material.color;
    					if (material.diffuseTexture) {
    						Color textureColor = material.diffuseTexture->getPixelAt(
    							(hitData->textureCoordinate.x * material.diffuseTexture->getRowSize()), 
    							(hitData->textureCoordinate.y * material.diffuseTexture->getColumnSize()));
-   						color += lightColor * textureColor * (-lightRay * surfaceNormal);
-   					} else color += lightColor * material.diffusionCoefficient * (-lightRay * surfaceNormal);
+   						if (lightRayTest > 0) {
+   							color += lightColor * textureColor * lightRayTest + (material.diffusionCoefficient 
+   								* (1 - material.textureAlpha));
+   						}
+   					} else if (lightRayTest > 0) color += lightColor * material.diffusionCoefficient * lightRayTest;
    					break;
    				case 2:
    					if (material.ambientTexture) {
    						Color textureColor = material.ambientTexture->getPixelAt(
    							(hitData->textureCoordinate.x * material.ambientTexture->getRowSize()), 
    							(hitData->textureCoordinate.y * material.ambientTexture->getColumnSize()));
-   						color = lightColor * textureColor;
-   					} else color = lightColor * material.color;
+   						if (lightRayTest > 0) {
+   							color += lightColor * textureColor + (material.color * (1 - material.textureAlpha));
+   						}
+   					} else if (lightRayTest > 0) color += lightColor * material.color;
    					if (material.diffuseTexture) {
    						Color textureColor = material.diffuseTexture->getPixelAt(
    							(hitData->textureCoordinate.x * material.diffuseTexture->getRowSize()), 
    							(hitData->textureCoordinate.y * material.diffuseTexture->getColumnSize()));
-   						color += lightColor * textureColor * (-lightRay * surfaceNormal);
-   					} else color += lightColor * material.diffusionCoefficient * (-lightRay * surfaceNormal);
-   					color += lightColor * pow((lightRay - (surfaceNormal * 2 * (surfaceNormal * lightRay))).normalize()
-   						* hitData->viewRay, material.specularExponent) * material.specularCoefficient;
-   					hit = trace(&hitData->reflectionRay, &hitData->hitPoint);
-   					color += shade(hit) * shape->material.specularCoefficient;
-   					delete hit;
+   						if (lightRayTest > 0) {
+   							color += lightColor * textureColor * lightRayTest + (material.diffusionCoefficient 
+   								* (1 - material.textureAlpha));
+   						}
+   					} else if (lightRayTest > 0) color += lightColor * material.diffusionCoefficient * lightRayTest;
+   					if (lightRayTest > 0) {
+   						color += lightColor * pow((lightRay - (surfaceNormal * 2 * lightRayTest)).normalize()
+   							* hitData->viewRay, material.specularExponent) * material.specularCoefficient;
+   					}
    			}
-         } else {
-         	if (shape->material.ambientTexture) {
-         		color += scene->ambientLight * shape->material.ambientTexture->getPixelAt(
-         			hitData->textureCoordinate.x * shape->material.ambientTexture->getRowSize(),
-         			hitData->textureCoordinate.y * shape->material.ambientTexture->getRowSize());
-         	} else color += shape->material.color;
          	delete shadow;
          }
          node = node->next;
       }
-   	color += scene->ambientLight;
+      if (shape->material.ambientTexture) {
+         Color textureColor = scene->ambientLight * shape->material.ambientTexture->getPixelAt(
+         	hitData->textureCoordinate.x * shape->material.ambientTexture->getRowSize(),
+         	hitData->textureCoordinate.y * shape->material.ambientTexture->getRowSize());
+         color += textureColor + (shape->material.color * (1 - shape->material.textureAlpha));
+    	} else color += shape->material.color + scene->ambientLight; 
+    	hit = trace(&hitData->reflectionRay, &hitData->hitPoint);
+   	color += shade(hit) * shape->material.specularCoefficient;
+   	delete hit;
    }
    depth = 0;
    return color;

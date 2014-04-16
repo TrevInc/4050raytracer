@@ -28,8 +28,7 @@ inline HitData *Plane::hit(const Vector *ray, const Vector *pixelPosition) const
    double distance((hitPoint - *pixelPosition).magnitude());
    Vector reflectionRay((*ray - (orientation * 2 * (orientation * *ray))).normalize());
    HitData *hitData = new HitData();
-   if (orientation * (*ray * -1) < 0) hitData->surfaceNormal = *ray * -1;
-   else hitData->surfaceNormal = orientation;
+   hitData->surfaceNormal = orientation;
    hitData->pixelPosition = *pixelPosition;
    hitData->reflectionRay = reflectionRay;
    hitData->hitPoint = hitPoint;

@@ -15,12 +15,16 @@ void Tokenizer::tokenize(const char *path) {
 	char line[BUFFER], c;
 	int ndx = 0;
    FILE *file = fopen(path, "r");
+   if (file == NULL) {
+   	printf("File Error: Unable to open file %s\n", path);
+   	exit(1);
+   }
    do {
    	c = fgetc(file);
 		switch (c) {
 			case '\n':
 				*(line + ndx) = '\0';
-				tokens->add(new String(line));
+				if (strlen(line) >= 1) tokens->add(new String(line));
 				tokens->add(new String("\n"));
 				ndx = 0;
 				break;
@@ -28,12 +32,6 @@ void Tokenizer::tokenize(const char *path) {
 				*(line + ndx) = '\0';
 				if (strlen(line) >= 1) tokens->add(new String(line));
 				tokens->add(new String("/"));
-				ndx = 0;
-				break;
-			case '\\':
-				*(line + ndx) = '\0';
-				if (strlen(line) >= 1) tokens->add(new String(line));
-				tokens->add(new String("\\"));
 				ndx = 0;
 				break;
 			case ' ':

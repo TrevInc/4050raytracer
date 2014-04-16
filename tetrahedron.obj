@@ -24,7 +24,7 @@ vn 0 -0.7071 -0.7071
 
 g front
 usemtl green_flag
-f 1 2 3
+f 1/1 2/2 3/3
 
 g sides
 f 2 4 3

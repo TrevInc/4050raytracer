@@ -21,14 +21,13 @@ Triangle::Triangle(
 		
 void Triangle::setPhongVectors(const Vector nv0, const Vector nv1, const Vector nv2) {
 	this->phongShading = true;
-	this->nv0 = nv0;
-	this->nv1 = nv1;
-	this->nv2 = nv2;
+	this->nv0 = nv0.normalize();
+	this->nv1 = nv1.normalize();
+	this->nv2 = nv2.normalize();
 }
 
 void Triangle::setTextureVectors(const Vector vt0, const Vector vt1, const Vector vt2) {
 	this->textureMap = true;
-	this->phongShading = true;
 	this->vt0 = vt0;
 	this->vt1 = vt1;
 	this->vt2 = vt2;
@@ -44,7 +43,8 @@ inline HitData *Triangle::hit(const Vector *ray, const Vector *pixelPosition) co
 	if (a > 1 || a < 0) {delete hitData; return NULL;}
 	if (b > 1 || b < 0) {delete hitData; return NULL;}
 	if (g > 1 || g < 0) {delete hitData; return NULL;}
-	if (phongShading) hitData->surfaceNormal = nv0 + ((nv1 - nv0) * b) + ((nv2 - nv0) * g);
+	if (phongShading) hitData->surfaceNormal = (nv0 + ((nv1 - nv0) * b) + ((nv2 - nv0) * g)).normalize();
 	if (textureMap) hitData->textureCoordinate = vt0 + ((vt1 - vt0) * b) + ((vt2 - vt0) * g);
+	hitData->reflectionRay = (*ray - (hitData->surfaceNormal * 2 * (hitData->surfaceNormal * *ray))).normalize();
 	return hitData;
 }

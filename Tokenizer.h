@@ -2,7 +2,6 @@
 #define TOKENIZER_H
 
 #include "List.h"
-#include "Object.h"
 #include "String.h"
 
 #define BUFFER 32

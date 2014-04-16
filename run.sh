@@ -1,4 +1,4 @@
 #!/bin/bash
 
-time ./objtrace tetrahedron.obj
+time ./objtrace
 display "images/out.png"

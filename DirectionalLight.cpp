@@ -7,8 +7,8 @@ DirectionalLight::DirectionalLight(
    const Vector direction, 
    const double intensity) :
    	Light(name, color, location, intensity),
-   	direction(direction) {}
+   	direction(direction.normalize()) {}
       
 inline const Vector *DirectionalLight::getDirection() const {return &direction;}
       
-void DirectionalLight::setDirection(const Vector direction) {this->direction = direction;}
+void DirectionalLight::setDirection(const Vector direction) {this->direction = direction.normalize();}

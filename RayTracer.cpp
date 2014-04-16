@@ -30,6 +30,8 @@ void RayTracer::load(const char *path) {
 	}
 }
 
+const Pixmap *RayTracer::getPixmap() const {return pixmap;}
+
 void RayTracer::render() {
 	camera.addScene(&scene);
    pixmap = camera.captureImage();

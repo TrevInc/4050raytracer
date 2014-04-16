@@ -2,7 +2,6 @@
 #define LIST_H
 
 #include "Node.h"
-#include "Object.h"
 #include <cstddef>
 
 class List {

@@ -7,7 +7,8 @@ Parser::Parser() :
 	bby0(-100000), 
 	bby1(100000), 
 	bbz0(-100000), 
-	bbz1(100000) {}
+	bbz1(100000),
+	line(1) {}
 
 Parser::~Parser() {delete faces;}
 
@@ -29,6 +30,7 @@ void Parser::parse(const char *path) {
 		else if (*token == "p") parse_p();
 		else if (*token == "s") parse_s();
 		else if (*token == "#") parse_comment();
+		else if (*token == "\n") line++;
 		else {}
 		token = tokenizer->nextToken();
 	}
@@ -84,33 +86,45 @@ BoundingBox *Parser::getAABB() const {
 // creates new triangle
 // handles three possible configurations v, v/t, v/vn/t
 void Parser::parse_f() {
-	int v1, v2, v3, n1, n2, n3, t1, t2, t3;
+	int v1, v2, v3, v4, n1, n2, n3, n4, t1, t2, t3, t4;
 	String *token;
 	v1 = tokenizer->nextToken()->toInt() - 1;
 	token = tokenizer->nextToken();
 	if (*token != "/") {
 		v2 = token->toInt() - 1;
 		v3 = tokenizer->nextToken()->toInt() - 1;
-		tokenizer->nextToken();
+		token = tokenizer->nextToken();
+		if (*token != "\n") {
+			v4 = token->toInt() - 1;
+			if (*tokenizer->nextToken() != "\n") {
+				printf("Syntax Error: line %d   unexpected token\n", line);
+				exit(1);
+			}
+			Triangle *triangle1 = new Triangle(
+				"triangle",
+				material,
+				*(Vector *)vertexes.getElementAtIndex(v1),
+				*(Vector *)vertexes.getElementAtIndex(v2),
+				*(Vector *)vertexes.getElementAtIndex(v3));
+			faces->add(triangle1);
+			Triangle *triangle2 = new Triangle(
+				"triangle",
+				material,
+				*(Vector *)vertexes.getElementAtIndex(v1),
+				*(Vector *)vertexes.getElementAtIndex(v3),
+				*(Vector *)vertexes.getElementAtIndex(v4));
+			faces->add(triangle2);
+			line++;
+			return;
+		}
 		Triangle *triangle = new Triangle(
 			"triangle",
 			material,
 			*(Vector *)vertexes.getElementAtIndex(v1),
 			*(Vector *)vertexes.getElementAtIndex(v2),
 			*(Vector *)vertexes.getElementAtIndex(v3));
-		if (vertexNormals.getSize() != 0) {
-			triangle->setPhongVectors(
-				*(Vector *)vertexNormals.getElementAtIndex(v1),
-				*(Vector *)vertexNormals.getElementAtIndex(v2),
-				*(Vector *)vertexNormals.getElementAtIndex(v3));
-		}
-		if (textureVertexes.getSize() != 0) {
-			triangle->setTextureVectors(
-				*(Vector *)textureVertexes.getElementAtIndex(v1),
-				*(Vector *)textureVertexes.getElementAtIndex(v2),
-				*(Vector *)textureVertexes.getElementAtIndex(v3));
-		}
 		faces->add(triangle);
+		line++;
 		return;
 	} 
 	token = tokenizer->nextToken();
@@ -124,42 +138,111 @@ void Parser::parse_f() {
 			v3 = tokenizer->nextToken()->toInt() - 1;
 			tokenizer->nextToken();
 			t3 = tokenizer->nextToken()->toInt() - 1;
-			tokenizer->nextToken();
+			token = tokenizer->nextToken();
+			if (*token != "\n") {
+				v4 = token->toInt() - 1;
+				tokenizer->nextToken();
+				t4 = tokenizer->nextToken()->toInt() - 1;
+				token = tokenizer->nextToken();
+				if (*token != "\n") {
+					printf("Syntax Error: line %d   unexpected token\n", line);
+					exit(1);
+				}
+				Triangle *triangle1 = new Triangle(
+					"triangle",
+					material,
+					*(Vector *)vertexes.getElementAtIndex(v1),
+					*(Vector *)vertexes.getElementAtIndex(v2),
+					*(Vector *)vertexes.getElementAtIndex(v3));
+				triangle1->setTextureVectors(
+					*(Vector *)textureVertexes.getElementAtIndex(t1),
+					*(Vector *)textureVertexes.getElementAtIndex(t2),
+					*(Vector *)textureVertexes.getElementAtIndex(t3));
+				faces->add(triangle1);
+				Triangle *triangle2 = new Triangle(
+					"triangle",
+					material,
+					*(Vector *)vertexes.getElementAtIndex(v1),
+					*(Vector *)vertexes.getElementAtIndex(v3),
+					*(Vector *)vertexes.getElementAtIndex(v4));
+				triangle2->setTextureVectors(
+					*(Vector *)textureVertexes.getElementAtIndex(t1),
+					*(Vector *)textureVertexes.getElementAtIndex(t3),
+					*(Vector *)textureVertexes.getElementAtIndex(t4));
+				faces->add(triangle2);
+				line++;
+				return;
+			}
 			Triangle *triangle = new Triangle(
 				"triangle",
 				material,
 				*(Vector *)vertexes.getElementAtIndex(v1),
 				*(Vector *)vertexes.getElementAtIndex(v2),
 				*(Vector *)vertexes.getElementAtIndex(v3));
-			if (vertexNormals.getSize() != 0) {
-				triangle->setPhongVectors(
-					*(Vector *)vertexNormals.getElementAtIndex(v1),
-					*(Vector *)vertexNormals.getElementAtIndex(v2),
-					*(Vector *)vertexNormals.getElementAtIndex(v3));
-			}
-			if (textureVertexes.getSize() != 0) {
-				triangle->setTextureVectors(
-					*(Vector *)textureVertexes.getElementAtIndex(t1),
-					*(Vector *)textureVertexes.getElementAtIndex(t2),
-					*(Vector *)textureVertexes.getElementAtIndex(t3));
-			}
+			triangle->setTextureVectors(
+				*(Vector *)textureVertexes.getElementAtIndex(t1),
+				*(Vector *)textureVertexes.getElementAtIndex(t2),
+				*(Vector *)textureVertexes.getElementAtIndex(t3));
 			faces->add(triangle);
+			line++;
 			return;	
 		}
 		n1 = tokenizer->nextToken()->toInt() - 1;
-		tokenizer->nextToken();
 		v2 = tokenizer->nextToken()->toInt() - 1;
 		tokenizer->nextToken();
 		t2 = tokenizer->nextToken()->toInt() - 1;
 		tokenizer->nextToken();
 		n2 = tokenizer->nextToken()->toInt() - 1;
-		tokenizer->nextToken();
 		v3 = tokenizer->nextToken()->toInt() - 1;
 		tokenizer->nextToken();
 		t3 = tokenizer->nextToken()->toInt() - 1;
 		tokenizer->nextToken();
 		n3 = tokenizer->nextToken()->toInt() - 1;
-		tokenizer->nextToken();
+		token = tokenizer->nextToken();
+		if (*token != "\n") {
+			v4 = token->toInt() - 1;
+			tokenizer->nextToken();
+			t4 = tokenizer->nextToken()->toInt() - 1;
+			tokenizer->nextToken();
+			n4 = tokenizer->nextToken()->toInt() - 1;
+			token = tokenizer->nextToken();
+			if (*token != "\n") {
+				printf("Syntax Error: line %d   unexpected token\n", line);
+				exit(1);
+			}
+			Triangle *triangle1 = new Triangle(
+				"triangle",
+				material,
+				*(Vector *)vertexes.getElementAtIndex(v1),
+				*(Vector *)vertexes.getElementAtIndex(v2),
+				*(Vector *)vertexes.getElementAtIndex(v3));
+			triangle1->setTextureVectors(
+				*(Vector *)textureVertexes.getElementAtIndex(t1),
+				*(Vector *)textureVertexes.getElementAtIndex(t2),
+				*(Vector *)textureVertexes.getElementAtIndex(t3));
+			triangle1->setPhongVectors(
+				*(Vector *)vertexNormals.getElementAtIndex(n1),
+				*(Vector *)vertexNormals.getElementAtIndex(n2),
+				*(Vector *)vertexNormals.getElementAtIndex(n3));
+			faces->add(triangle1);
+			Triangle *triangle2 = new Triangle(
+				"triangle",
+				material,
+				*(Vector *)vertexes.getElementAtIndex(v1),
+				*(Vector *)vertexes.getElementAtIndex(v3),
+				*(Vector *)vertexes.getElementAtIndex(v4));
+			triangle2->setTextureVectors(
+				*(Vector *)textureVertexes.getElementAtIndex(t1),
+				*(Vector *)textureVertexes.getElementAtIndex(t3),
+				*(Vector *)textureVertexes.getElementAtIndex(t4));
+			triangle2->setPhongVectors(
+				*(Vector *)vertexNormals.getElementAtIndex(n1),
+				*(Vector *)vertexNormals.getElementAtIndex(n3),
+				*(Vector *)vertexNormals.getElementAtIndex(n4));
+			faces->add(triangle2);
+			line++;
+			return;
+		}
 		Triangle *triangle = new Triangle(
 			"triangle",
 			material,
@@ -175,6 +258,7 @@ void Parser::parse_f() {
 			*(Vector *)textureVertexes.getElementAtIndex(t2),
 			*(Vector *)textureVertexes.getElementAtIndex(t3));
 		faces->add(triangle);
+		line++;
 		return;
 	}
 	if (*token == "/") {
@@ -187,7 +271,41 @@ void Parser::parse_f() {
 		tokenizer->nextToken();
 		tokenizer->nextToken();
 		n3 = tokenizer->nextToken()->toInt() - 1;
-		tokenizer->nextToken();
+		token = tokenizer->nextToken();
+		if (*token != "\n") {
+			v4 = token->toInt() - 1;
+			tokenizer->nextToken();
+			tokenizer->nextToken();
+			n4 = tokenizer->nextToken()->toInt() - 1;
+			if (*tokenizer->nextToken() != "\n") {
+				printf("Syntax Error: line %d   unexpected token\n", line);
+				exit(1);
+			}
+			Triangle *triangle1 = new Triangle(
+				"triangle",
+				material,
+				*(Vector *)vertexes.getElementAtIndex(v1),
+				*(Vector *)vertexes.getElementAtIndex(v2),
+				*(Vector *)vertexes.getElementAtIndex(v3));
+			triangle1->setPhongVectors(
+				*(Vector *)vertexNormals.getElementAtIndex(n1),
+				*(Vector *)vertexNormals.getElementAtIndex(n2),
+				*(Vector *)vertexNormals.getElementAtIndex(n3));
+			faces->add(triangle1);
+			Triangle *triangle2 = new Triangle(
+				"triangle",
+				material,
+				*(Vector *)vertexes.getElementAtIndex(v1),
+				*(Vector *)vertexes.getElementAtIndex(v3),
+				*(Vector *)vertexes.getElementAtIndex(v4));
+			triangle2->setPhongVectors(
+				*(Vector *)vertexNormals.getElementAtIndex(n1),
+				*(Vector *)vertexNormals.getElementAtIndex(n3),
+				*(Vector *)vertexNormals.getElementAtIndex(n4));
+			faces->add(triangle2);
+			line++;
+			return;
+		}
 		Triangle *triangle = new Triangle(
 			"triangle",
 			material,
@@ -198,19 +316,14 @@ void Parser::parse_f() {
 			*(Vector *)vertexNormals.getElementAtIndex(n1),
 			*(Vector *)vertexNormals.getElementAtIndex(n2),
 			*(Vector *)vertexNormals.getElementAtIndex(n3));
-		if (textureVertexes.getSize() != 0) {
-			triangle->setTextureVectors(
-				*(Vector *)textureVertexes.getElementAtIndex(v1),
-				*(Vector *)textureVertexes.getElementAtIndex(v2),
-				*(Vector *)textureVertexes.getElementAtIndex(v3));
-		}
 		faces->add(triangle);
+		line++;
 		return;
 	}
 }
 
 // Parse v token in .obj file
-void Parser::parse_v() {
+inline void Parser::parse_v() {
 	Vector *vector = new Vector();
 	vector->x = tokenizer->nextToken()->toFloat();
 	if (vector->x > bbx0) bbx0 = vector->x;
@@ -221,42 +334,66 @@ void Parser::parse_v() {
 	vector->z = tokenizer->nextToken()->toFloat();
 	if (vector->z > bbz0) bbz0 = vector->z;
 	if (vector->z < bbz1) bbz1 = vector->z;
+	if (*tokenizer->nextToken() != "\n") {
+		printf("Syntax Error: line %d   unexpected token\n", line);
+		exit(1);
+	}
 	vertexes.add(vector);
-	tokenizer->nextToken();
+	line++;
 }
 
 // Parse vn token in .obj file
-void Parser::parse_vn() {
+inline void Parser::parse_vn() {
 	Vector *vector = new Vector();
 	vector->x = tokenizer->nextToken()->toFloat();
 	vector->y = tokenizer->nextToken()->toFloat();
 	vector->z = tokenizer->nextToken()->toFloat();
+	if (*tokenizer->nextToken() != "\n") {
+		printf("Syntax Error: line %d   unexpected token\n", line);
+		exit(1);
+	}
 	vertexNormals.add(vector);
-	tokenizer->nextToken();
+	line++;
 }
 
-// Parse vt tokein in .obj file
+// Parse vt token in .obj file
 // adds to texture vertex list
-void Parser::parse_vt() {
+inline void Parser::parse_vt() {
 	Vector *vector = new Vector();
 	vector->x = tokenizer->nextToken()->toFloat();
 	vector->y = tokenizer->nextToken()->toFloat();
-	textureVertexes.add(vector);
-	tokenizer->nextToken();
+	if (*tokenizer->nextToken() != "\n") {
+		if (*tokenizer->nextToken() != "\n") {
+			printf("Syntax Error: line %d\n   unexpected token", line);
+			exit(1);
+		} 
+	}
+	textureVertexes.add(vector); 
+	line++;
 }
 
 // Parse g token in .obj file
 // ignored
 void Parser::parse_g() {
-	if (*tokenizer->nextToken() != '\n') tokenizer->nextToken();
+	printf("Warning: line %d   object group declarations not supported\n", line);
+	fflush(stdout);
+	if (*tokenizer->nextToken() != "\n") tokenizer->nextToken();
+	line++;
 }
 
 // Parse usemtl token in .obj file
 // gets material to use from token argument
 // puts material on the stack
 void Parser::parse_usemtl() {
-	material = *findMaterial(tokenizer->nextToken());
+	String *token = tokenizer->nextToken();
+	Material *mtl = findMaterial(token);
+	if (!mtl) {
+		printf("Error: line %d   undefined reference to material \"%s\"", line, token->getString());
+		exit(1);
+	}
+	material = *mtl;
 	tokenizer->nextToken();
+	line++;
 }
 
 // Parse Ka token in .mtl file
@@ -322,6 +459,7 @@ void Parser::parse_illum() {
 void Parser::parse_mtllib() { 
 	parseMaterialLibrary(tokenizer->nextToken());
 	tokenizer->nextToken();
+	line++;
 }
 
 // Parse map_Ka
@@ -362,34 +500,42 @@ void Parser::parse_d() {
 // ignored
 // .obj file
 void Parser::parse_s() {
+	printf("Warning: line %d   ? declarations not supported\n", line);
+	fflush(stdout);
 	String *token = tokenizer->nextToken();
 	while (*token != '\n') token = tokenizer->nextToken();
+	line++;
 }
 
 // Parse l token
 // ignored
 // .obj file
 void Parser::parse_l() {
+	printf("Warning: line %d   line declarations not supported\n", line);
+	fflush(stdout);
 	String *token = tokenizer->nextToken();
 	while (*token != '\n') token = tokenizer->nextToken();
+	line++;
 }
 
 // Parse p token
 // ignored
 // .obj file
 void Parser::parse_p() {
+	printf("Warning: line %d   point declarations not supported\n", line);
+	fflush(stdout);
 	String *token = tokenizer->nextToken();
 	while (*token != '\n') token = tokenizer->nextToken();
+	line++;
 }
 
 // Parse comment in .mtl file
 void Parser::parse_material_comment() {
-	String *token = materialTokenizer->nextToken();
-	while (*token != '\n') token = materialTokenizer->nextToken();
+	while (*materialTokenizer->nextToken() != "\n");
 }
 
 // Parse comment in .obj file
 void Parser::parse_comment() {
-	String *token = tokenizer->nextToken();
-	while (*token != '\n') token = tokenizer->nextToken();
+	while (*tokenizer->nextToken() != "\n");
+	line++;
 }

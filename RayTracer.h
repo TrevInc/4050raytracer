@@ -18,6 +18,7 @@ class RayTracer {
        	void addLight(const Light *light);
        	void load(const char *path);
        	void save(const char *path);
+       	const Pixmap *getPixmap() const;
        	void render();
        	void ambientLight(const Color color);
        	void aspectRatio(const double ratio);
