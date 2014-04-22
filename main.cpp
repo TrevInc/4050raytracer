@@ -19,29 +19,8 @@ void display () {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    glEnable(GL_NORMALIZE);
-    glEnable(GL_LIGHTING);
-    glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
-
-    // TODO: count up the number of textures in the image -- iterator or counter?
-    // TODO: Generate texture names for every texture
-
-    // glGenTextures(	GLsizei n, GLuint * textures); //<< texture name unsigned ints stored in this array
-
     /* for each polygon P in rayTracer.scene.shapes { */
     //TODO: can you write an iterator over List for this?
-
-        /* select material properties -- ambient, diffuse, specular, exponent Ka Kd Ks Ns*/
-            //	glMaterialfv(GL_FRONT_AND_BACK,   GL_AMBIENT, P.material.ambientCoefficient); // TODO: doesn't exist -- need
-	        //  glMaterialfv(GL_FRONT_AND_BACK,   GL_DIFFUSE, P.material.diffuseCoefficient);
-	        //  glMaterialfv(GL_FRONT_AND_BACK,  GL_SPECULAR, P.material.specularCoefficient);
-	        //   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, P.material.specularExponent);
-
-        /* bind a texture if applicable */
-
-            //  if (P.textureMap == true) {
-            //      glBindTexture (GL_TEXTURE_2D, P.material->ambientTexture.textureID); // TODO: get or store textureID of texture being bound
-            //  }
 
         /* render the polygon */
         	/*  draw each face as follows */
@@ -59,30 +38,6 @@ void display () {
             //  glEnd();	//	GL_POLYGON
     //}
 
-    /* enable lighting if it's called for */
-
-    //if (lights.getSize > 0) {
-    //
-    // TODO: write iterator for list of lights to define them here
-    // TODO: glEnable(GL_LIGHT0) through whatever
-
-    /* traverse list of lights and declare glLightfv for each */
-    /* instructions for type params at http://www.opengl.org/sdk/docs/man2/xhtml/glLight.xml‎ */
-    //
-    //  glLightfv(light_number, pname,  params);
-    //
-    //}
-    /* for each light that is on -- assign location/directions from your list of lights */
-    //if (lights.getSize > 0) {
-    // TODO: use same iterator for lights to move them around the scene
-
-         //GLfloat lightpos[] = {.5, 1., 1., 0.}; //or whatever your light position is
-         //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
-
-
-    //}    
-
-    /* if I'm forgetting something add it here */
 
     /* now call gluLookAt to transform everything to where the camera is now */
     /* found at http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml */
@@ -176,6 +131,58 @@ int main( int argc, char** argv) {
     glutInitWindowSize (600, 475); 
     glutInitWindowPosition (100, 100);
     glutCreateWindow ("Raytracer Final");
+
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_LIGHTING);
+    glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
+
+    // TODO: count up the number of textures in the image -- iterator or counter?
+    // TODO: Generate texture names for every texture
+
+    // glGenTextures(	GLsizei n, GLuint * textures); //<< texture name unsigned ints stored in this array
+
+    /* for each polygon P in rayTracer.scene.shapes { */
+    //TODO: can you write an iterator over List for this?
+
+        /* select material properties -- ambient, diffuse, specular, exponent Ka Kd Ks Ns*/
+            //	glMaterialfv(GL_FRONT_AND_BACK,   GL_AMBIENT, P.material.ambientCoefficient); // TODO: doesn't exist -- need
+	        //  glMaterialfv(GL_FRONT_AND_BACK,   GL_DIFFUSE, P.material.diffuseCoefficient);
+	        //  glMaterialfv(GL_FRONT_AND_BACK,  GL_SPECULAR, P.material.specularCoefficient);
+	        //   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, P.material.specularExponent);
+
+        /* bind a texture if applicable */
+
+            //  if (P.textureMap == true) {
+            //      glBindTexture (GL_TEXTURE_2D, P.material->ambientTexture.textureID); // TODO: get or store textureID of texture being bound
+            //  }
+
+    //}
+
+    /* enable lighting if it's called for */
+
+    //if (rayTracer.scene.lights.getSize > 0) {
+    //
+    // TODO: write iterator for list of lights to define them here
+    // TODO: glEnable(GL_LIGHT0) through whatever
+
+    /* traverse list of lights and declare glLightfv for each */
+    /* instructions for type params at http://www.opengl.org/sdk/docs/man2/xhtml/glLight.xml‎ */
+    //
+    //  glLightfv(light_number, pname,  params);
+    //
+    //}
+    /* for each light that is on -- assign location/directions from your list of lights */
+    //if (rayTracer.scene.lights.getSize > 0) {
+    // TODO: use same iterator for lights to move them around the scene
+
+         //GLfloat lightpos[] = {.5, 1., 1., 0.}; //or whatever your light position is
+         //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+
+
+    //}    
+
+    /* if I'm forgetting something add it here */
+
 
     glutDisplayFunc(display); 
     glutKeyboardFunc(handleKey);
