@@ -1,3 +1,4 @@
+#include <iostream>
 #include "RayTracer.h"
 #include "SpotLight.h"
 #include "PointLight.h"
@@ -11,36 +12,88 @@
 #  include <GL/glut.h>
 #endif
 
+RayTracer rayTracer;
+
 void display () {
+    glClearColor(0,0,0,0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    /* for each polygon { */
+
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_LIGHTING);
+    glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
+
+    // TODO: count up the number of textures in the image -- iterator or counter?
+    // TODO: Generate texture names for every texture
+
+    // glGenTextures(	GLsizei n, GLuint * textures); //<< texture name unsigned ints stored in this array
+
+    /* for each polygon P in rayTracer.scene.shapes { */
+    //TODO: can you write an iterator over List for this?
+
         /* select material properties -- ambient, diffuse, specular, exponent Ka Kd Ks Ns*/
-            //	glMaterialfv(GL_FRONT_AND_BACK,   GL_AMBIENT, something.Ka);
-	        //  glMaterialfv(GL_FRONT_AND_BACK,   GL_DIFFUSE, something.Kd);
-	        //  glMaterialfv(GL_FRONT_AND_BACK,  GL_SPECULAR, something.Ks);
-	        //   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, something.Ns);
+            //	glMaterialfv(GL_FRONT_AND_BACK,   GL_AMBIENT, P.material.ambientCoefficient); // TODO: doesn't exist -- need
+	        //  glMaterialfv(GL_FRONT_AND_BACK,   GL_DIFFUSE, P.material.diffuseCoefficient);
+	        //  glMaterialfv(GL_FRONT_AND_BACK,  GL_SPECULAR, P.material.specularCoefficient);
+	        //   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, P.material.specularExponent);
+
         /* bind a texture if applicable */
-            //  if (something.hasTexture()) {
-            //      glBindTexture (GL_TEXTURE_2D, something.textureID);
+
+            //  if (P.textureMap == true) {
+            //      glBindTexture (GL_TEXTURE_2D, P.material->ambientTexture.textureID); // TODO: get or store textureID of texture being bound
             //  }
+
         /* render the polygon */
         	/*  draw each face as follows */
 	        //  glColor3f(1, 1, 0);
-	        //  glBegin(GL_POLYGON);
-	        /*  for each vertex { */
-            //      glNormal3fv( something.thisvertexnormal );
+	        //  glBegin(GL_POLYGON); // TODO: can also write separate render pipes of fixed size for
+                                     // tris and quads if you don't want to make a vertex iterator
+
+	        /*  for each vertex V in P { */ // TODO: make iterator for vertices
+            //      glNormal3fv( P.orientation );
             //      if (something.hasTexture() && something.hasTextureCoords())
-	        //         { glTexCoord3fv(something.thisvertextexturecoords); } 
-            //      glVertex3fv( something.thisvertexlocation );
+	        //         { glTexCoord3fv( /* texture map data here*/ ); } 
+            //      glVertex3fv( /* p0, p1, p2 as applicable */ );
             //  }
+
             //  glEnd();	//	GL_POLYGON
     //}
+
     /* enable lighting if it's called for */
-    /* for each light -- activate lights */
-    /* now shade everything */
+
+    //if (lights.getSize > 0) {
+    //
+    // TODO: write iterator for list of lights to define them here
+    // TODO: glEnable(GL_LIGHT0) through whatever
+
+    /* traverse list of lights and declare glLightfv for each */
+    /* instructions for type params at http://www.opengl.org/sdk/docs/man2/xhtml/glLight.xml‎ */
+    //
+    //  glLightfv(light_number, pname,  params);
+    //
+    //}
+    /* for each light that is on -- assign location/directions from your list of lights */
+    //if (lights.getSize > 0) {
+    // TODO: use same iterator for lights to move them around the scene
+
+         //GLfloat lightpos[] = {.5, 1., 1., 0.}; //or whatever your light position is
+         //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+
+
+    //}    
+
     /* if I'm forgetting something add it here */
+
     /* now call gluLookAt to transform everything to where the camera is now */
+    /* found at http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml */
+
+    //TODO: get the appropriate values for this from the camera
+    /*
+    gluLookAt(	
+    eyeX, eyeY, eyeZ,           //Location of viewscreen
+ 	centerX, centerY, centerZ,  //Direction to look
+    upX, upY, upZ);             //Direction of up
+    */
 
     /* now pipe this beautiful image to the screen */
     glFlush();
@@ -67,15 +120,27 @@ void handleKey(unsigned char key, int x, int y){
   switch(key){
 
      //TODO: keybindings for arrows and A/Z to move in scene
+     //Do by altering dimensions of eye point
+
+     //TODO: keybindings for TGFH to aim up/down/left/right
+     //Since WASD is taken. Use trig to rotate forward/up vectors
 
      case 'r':
      case 'R':
       //trace image and display in window
+      std::cout << "Rendering..." << std::endl;
+      rayTracer.render();
+      std::cout << "Rendering complete." << std::endl;
+      //TODO: system call to display traced image
       break;
       
      case 'w':
      case 'W':
       //write raytraced image to disk
+      //TODO: add prompt
+      std::cout << "Saving..." << std::endl;
+      rayTracer.saveImage("images/out.png");
+      std::cout << "Saving complete." << std::endl;
       break;
       
     case 'q':		
@@ -89,7 +154,6 @@ void handleKey(unsigned char key, int x, int y){
 }
 
 int main( int argc, char** argv) {
-    RayTracer rayTracer;
     rayTracer.cameraViewPoint(Vector(0, -40, 35));
     rayTracer.cameraViewDirection(Vector(0, 1, -0.7));
     rayTracer.screenPixelWidth(600);
