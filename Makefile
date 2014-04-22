@@ -17,21 +17,17 @@ endif
 
 HFILES = Object.${H}\
 			ColoredObject.${H}\
-			RGBApixel.${H}\
 			Pixmap.${H}\
 			Image.${H}\
-			Node.${H}\
 			List.${H}\
 			Scene.${H}\
 			Shape.${H}\
-			Sphere.${H}\
 			Vector.${H}\
 			Color.${H}\
 			Light.${H}\
 			PointLight.${H}\
 			ParallelLight.${H}\
 			SpotLight.${H}\
-			Plane.${H}\
 			Camera.${H}\
 			HitData.${H}\
 			Material.${H}\
@@ -40,26 +36,22 @@ HFILES = Object.${H}\
 			RayTracer.${H}\
 			DirectionalLight.${H}\
 			Triangle.${H}\
-			String.${H}\
-			BoundingBox.${H}
+			String.${H}
 
 SFILES = main.${C}\
 			Object.${C}\
 			ColoredObject.${C}\
 			Pixmap.${C}\
 			Image.${C}\
-			Node.${C}\
 			List.${C}\
 			Scene.${C}\
 			Shape.${C}\
-			Sphere.${C}\
 			Vector.${C}\
 			Color.${C}\
 			Light.${C}\
 			PointLight.${C}\
 			ParallelLight.${C}\
 			SpotLight.${C}\
-			Plane.${C}\
 			Camera.${C}\
 			Material.${C}\
 			Parser.${C}\
@@ -67,25 +59,21 @@ SFILES = main.${C}\
 			RayTracer.${C}\
 			DirectionalLight.${C}\
 			Triangle.${C}\
-			String.${C}\
-			BoundingBox.${C}
+			String.${C}
 
 OFILES = Object.o\
 			ColoredObject.o\
 			Pixmap.o\
 			Image.o\
-			Node.o\
 			List.o\
 			Scene.o\
 			Shape.o\
-			Sphere.o\
 			Vector.o\
 			Color.o\
 			Light.o\
 			PointLight.o\
 			ParallelLight.o\
 			SpotLight.o\
-			Plane.o\
 			Camera.o\
 			Material.o\
 			Parser.o\
@@ -93,8 +81,7 @@ OFILES = Object.o\
 			RayTracer.o\
 			DirectionalLight.o\
 			Triangle.o\
-			String.o\
-			BoundingBox.o
+			String.o
 
 ${PROJECT}: main.o $(OFILES)
 	${CC} $(CFLAGS) -o ${PROJECT} main.o $(OFILES) $(LDFLAGS)
@@ -113,9 +100,6 @@ Pixmap.o: Pixmap.${C} Pixmap.${H}
 
 Image.o: Image.${C} Image.${H}
 	${CC} $(CFLAGS) -c Image.${C}
-
-Node.o: Node.${C} Node.${H}
-	${CC} $(CFLAGS) -c Node.${C}
 	
 List.o: List.${C} List.${H}
 	${CC} $(CFLAGS) -c List.${C}
@@ -125,9 +109,6 @@ Scene.o: Scene.${C} Scene.${H}
 	
 Shape.o: Shape.${C} Shape.${H}
 	${CC} $(CFLAGS) -c Shape.${C}
-
-Sphere.o: Sphere.${C} Sphere.${H}
-	${CC} $(CFLAGS) -c Sphere.${C}
 
 Vector.o: Vector.${C} Vector.${H}
 	${CC} $(CFLAGS) -c Vector.${C}
@@ -146,9 +127,6 @@ ParallelLight.o: ParallelLight.${C} ParallelLight.${H}
 
 SpotLight.o: SpotLight.${C} SpotLight.${H}
 	${CC} $(CFLAGS) -c SpotLight.${C}
-
-Plane.o: Plane.${C} Plane.${H}
-	${CC} $(CFLAGS) -c Plane.${C}
 
 Camera.o: Camera.${C} Camera.${H}
 	${CC} $(CFLAGS) -c Camera.${C}
@@ -173,9 +151,6 @@ Triangle.o: Triangle.${C} Triangle.${H}
 
 String.o: String.${C} String.${H}
 	${CC} $(CFLAGS) -c String.${C}
-	
-BoundingBox.o: BoundingBox.${C} BoundingBox.${H}
-	${CC} $(CFLAGS) -c BoundingBox.${C}
 
 clean:
 	rm -f core.* *.o *~ core.* *.tar *.gch

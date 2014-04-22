@@ -2,36 +2,16 @@
 
 Color::Color() : red(0), green(0), blue(0) {}
 
-Color::Color(const RGBApixel *pixel) : 
-	red(pixel->red / (double)255), 
-	green(pixel->green / (double)255), 
-	blue(pixel->blue / (double)255) {}
-
 Color::Color(const double red, const double green, const double blue) : 
 	red(red<1?red:1), 
 	green(green<1?green:1), 
 	blue(blue<1?blue:1) {}
 
-const RGBApixel Color::toPixel() const {
-    RGBApixel pixel;
-    pixel.red = red * 255;
-    pixel.green = green * 255;
-    pixel.blue = blue * 255;
-    pixel.alpha = 255;
-    return pixel;
-}
+void Color::setRed(const double red) {red<1?this->red=red:this->red=1;}
 
-void Color::setRed(const double red) {
-	red < 1 ? this->red = red : this->red = 1;
-}
+void Color::setGreen(const double green) {green<1?this->green=green:this->green=1;}
 
-void Color::setGreen(const double green) {
-	green < 1 ? this->green = green : this->green = 1;
-}
-
-void Color::setBlue(const double blue) {
-	blue < 1 ? this->blue = blue : this->blue = 1;
-}
+void Color::setBlue(const double blue) {blue<1?this->blue=blue:this->blue=1;}
 
 Color &Color::operator+=(const Color& color) {
    red += color.red;

@@ -12,6 +12,7 @@ Camera::Camera() :
    up(Vector(0, 1, 0)), 
    projectionView(true), 
    antialiasing(false),
+   reflections(false),
    scene(NULL) {}
       
 inline HitData *Camera::trace(const Vector *ray, const Vector *pixelPosition) {
@@ -20,7 +21,7 @@ inline HitData *Camera::trace(const Vector *ray, const Vector *pixelPosition) {
    Node *node(scene->shapes.head);     
    double previousDistance(MAX_DOUBLE);
    while (node) {
-      hitData = ((Shape *)node->data)->hit(ray, pixelPosition);
+      hitData = ((Triangle *)node->data)->hit(ray, pixelPosition);
       if (hitData) hitShapes.add(new HitData(*hitData));
       if (hitData) delete hitData;
       node = node->next;
@@ -43,10 +44,11 @@ inline Color Camera::shade(const HitData *hitData) {
 	Color color; 
    static int depth(0);
    if (++depth < recursionLevel && hitData) {
-      Shape *shape((Shape *)hitData->hitObject);
+      Triangle *shape((Triangle *)hitData->hitObject);
    	Light *light;
    	Vector lightRay;
    	HitData *hit, *shadow;
+   	Material material(shape->material);
    	Node *node(scene->lights.head);
       while (node) {
          light = (Light *)node->data;
@@ -55,67 +57,60 @@ inline Color Camera::shade(const HitData *hitData) {
          if (!shadow) { 
    			Color lightColor(light->color * light->getIntensity(&hitData->hitPoint));
    			Vector surfaceNormal(hitData->surfaceNormal);
-   			Material material(shape->material);
    			double lightRayTest(lightRay * surfaceNormal);
-   			switch (material.shadingModel) {
-   				case 0:
-   					color += material.diffusionCoefficient;
-   					break;
-   				case 1:
-   					if (material.ambientTexture) {
-   						Color textureColor = material.ambientTexture->getPixelAt(
-   							(hitData->textureCoordinate.x * material.ambientTexture->getRowSize()), 
-   							(hitData->textureCoordinate.y * material.ambientTexture->getColumnSize()));
-   						if (lightRayTest > 0) {
-   							color += lightColor * textureColor + (material.color * ((1 - material.textureAlpha)));
-   						}
-   					} else if (lightRayTest > 0) color += lightColor * material.color;
-   					if (material.diffuseTexture) {
-   						Color textureColor = material.diffuseTexture->getPixelAt(
-   							(hitData->textureCoordinate.x * material.diffuseTexture->getRowSize()), 
-   							(hitData->textureCoordinate.y * material.diffuseTexture->getColumnSize()));
-   						if (lightRayTest > 0) {
-   							color += lightColor * textureColor * lightRayTest + (material.diffusionCoefficient 
-   								* (1 - material.textureAlpha));
-   						}
-   					} else if (lightRayTest > 0) color += lightColor * material.diffusionCoefficient * lightRayTest;
-   					break;
-   				case 2:
-   					if (material.ambientTexture) {
-   						Color textureColor = material.ambientTexture->getPixelAt(
-   							(hitData->textureCoordinate.x * material.ambientTexture->getRowSize()), 
-   							(hitData->textureCoordinate.y * material.ambientTexture->getColumnSize()));
-   						if (lightRayTest > 0) {
-   							color += lightColor * textureColor + (material.color * (1 - material.textureAlpha));
-   						}
-   					} else if (lightRayTest > 0) color += lightColor * material.color;
-   					if (material.diffuseTexture) {
-   						Color textureColor = material.diffuseTexture->getPixelAt(
-   							(hitData->textureCoordinate.x * material.diffuseTexture->getRowSize()), 
-   							(hitData->textureCoordinate.y * material.diffuseTexture->getColumnSize()));
-   						if (lightRayTest > 0) {
-   							color += lightColor * textureColor * lightRayTest + (material.diffusionCoefficient 
-   								* (1 - material.textureAlpha));
-   						}
-   					} else if (lightRayTest > 0) color += lightColor * material.diffusionCoefficient * lightRayTest;
-   					if (lightRayTest > 0) {
-   						color += lightColor * pow((lightRay - (surfaceNormal * 2 * lightRayTest)).normalize()
-   							* hitData->viewRay, material.specularExponent) * material.specularCoefficient;
-   					}
+   			double viewRayTest(-hitData->viewRay * surfaceNormal);
+   			if (viewRayTest > 0 && lightRayTest > 0) {
+   				switch (material.shadingModel) {
+   					case 0:
+   						color += material.diffusionCoefficient;
+   						break;
+   					case 1:
+   						if (shape->textureMap && material.ambientTexture) {
+   							Color textureColor = material.ambientTexture->getPixelAt(
+   								(hitData->textureCoordinate.x * material.ambientTexture->getRowSize()), 
+   								(hitData->textureCoordinate.y * material.ambientTexture->getColumnSize()));
+   								color += lightColor * (textureColor * material.textureAlpha) + material.color;
+   						} else color += lightColor * material.color;
+   						if (shape->textureMap && material.diffuseTexture) {
+   							Color textureColor = material.diffuseTexture->getPixelAt(
+   								(hitData->textureCoordinate.x * material.diffuseTexture->getRowSize()), 
+   								(hitData->textureCoordinate.y * material.diffuseTexture->getColumnSize()));
+   								color += lightColor * (textureColor * material.textureAlpha) 
+   									* lightRayTest + material.diffusionCoefficient;
+   						} else color += lightColor * material.diffusionCoefficient * lightRayTest;
+   						break;
+   					case 2:
+   						if (shape->textureMap && material.ambientTexture) {
+   							Color textureColor = material.ambientTexture->getPixelAt(
+   								(hitData->textureCoordinate.x * material.ambientTexture->getRowSize()), 
+   								(hitData->textureCoordinate.y * material.ambientTexture->getColumnSize()));
+   								color += lightColor * (textureColor * material.textureAlpha) + material.color;
+   						} else color += lightColor * material.color;
+   						if (shape->textureMap && material.diffuseTexture) {
+   							Color textureColor = material.diffuseTexture->getPixelAt(
+   								(hitData->textureCoordinate.x * material.diffuseTexture->getRowSize()), 
+   								(hitData->textureCoordinate.y * material.diffuseTexture->getColumnSize()));
+   								color += lightColor * (textureColor * material.textureAlpha) 
+   									* lightRayTest + material.diffusionCoefficient;
+   						} else color += lightColor * material.diffusionCoefficient * lightRayTest;
+   							color += lightColor * pow((lightRay - (surfaceNormal * 2 * lightRayTest)).normalize()
+   								* hitData->viewRay, material.specularExponent) * material.specularCoefficient;
+   				}	
    			}
-         	delete shadow;
-         }
+         } else delete shadow;
          node = node->next;
       }
-      if (shape->material.ambientTexture) {
+      if (shape->textureMap && material.ambientTexture) {
          Color textureColor = scene->ambientLight * shape->material.ambientTexture->getPixelAt(
          	hitData->textureCoordinate.x * shape->material.ambientTexture->getRowSize(),
          	hitData->textureCoordinate.y * shape->material.ambientTexture->getRowSize());
-         color += textureColor + (shape->material.color * (1 - shape->material.textureAlpha));
+         color += (textureColor * material.textureAlpha) + material.color;
     	} else color += shape->material.color + scene->ambientLight; 
-    	hit = trace(&hitData->reflectionRay, &hitData->hitPoint);
-   	color += shade(hit) * shape->material.specularCoefficient;
-   	delete hit;
+    	if (reflections) {
+    		hit = trace(&hitData->reflectionRay, &hitData->hitPoint);
+   		color += shade(hit) * shape->material.specularCoefficient;
+   		delete hit;
+   	}
    }
    depth = 0;
    return color;
@@ -152,68 +147,46 @@ Pixmap *Camera::captureImage() {
         		g += color.green;
         		b += color.blue;
          }
-         color = Color(r / antialiasingLevel, g / antialiasingLevel, b / antialiasingLevel);
-         pixmap->setPixelAt(j, i, color.toPixel());	
+         color.setRed(r / antialiasingLevel);
+         color.setGreen(g / antialiasingLevel);
+         color.setBlue(b / antialiasingLevel);
+         pixmap->setPixelAt(j, i, color);	
       }
    }
    return pixmap;
 }
 
-void Camera::addScene(const Scene *scene) {
-	this->scene = scene;
-}
+void Camera::addScene(const Scene *scene) {this->scene = scene;}
 
-void Camera::setScreenWidth(const double width) {
-	screenWidth = width;
-}
+void Camera::setScreenWidth(const double width) {screenWidth = width;}
 
-void Camera::setScreenPixelWidth(const int pixels) {
-	screenPixelWidth = pixels;
-}
+void Camera::setScreenPixelWidth(const int pixels) {screenPixelWidth = pixels;}
 
-void Camera::setAspectRatio(const double ratio) {
-	aspectRatio = ratio;
-}
+void Camera::setAspectRatio(const double ratio) {aspectRatio = ratio;}
 
-void Camera::setFocalLength(const double focalLength) {
-	this->focalLength = focalLength;
-}
+void Camera::setFocalLength(const double focalLength) {this->focalLength = focalLength;}
 
-void Camera::setViewPoint(const Vector viewPoint) {
-	this->viewPoint = viewPoint;
-}
+void Camera::setViewPoint(const Vector viewPoint) {this->viewPoint = viewPoint;}
 
-void Camera::setViewDirection(const Vector direction) {
-	this->direction = direction.normalize();
-}
+void Camera::setViewDirection(const Vector direction) {this->direction = direction.normalize();}
 
-void Camera::setUpDirection(const Vector up) {
-	this->up = up.normalize();
-}
+void Camera::setUpDirection(const Vector up) {this->up = up.normalize();}
 
-void Camera::setProjectionView() {
-	projectionView = true;
-}
+void Camera::setProjectionView() {projectionView = true;}
 
-void Camera::setOrthographicView() {
-	projectionView = false;
-}
+void Camera::setOrthographicView() {projectionView = false;}
 
-void Camera::enableAntialiasing() {
-	antialiasing = true;
-}
+void Camera::enableAntialiasing() {antialiasing = true;}
 
-void Camera::disableAntialiasing() {
-	antialiasing = false;
-}
+void Camera::disableAntialiasing() {antialiasing = false;}
 
-void Camera::setRecursionLevel(const int level) {
-	recursionLevel = level;
-}
+void Camera::setRecursionLevel(const int level) {recursionLevel = level;}
 
-void Camera::setAntialiasingLevel(const int level) {
-	antialiasingLevel < 1 ? antialiasingLevel = 1 : antialiasingLevel = level;
-}
+void Camera::setAntialiasingLevel(const int level) {antialiasingLevel<1?antialiasingLevel=1:antialiasingLevel=level;}
+
+void Camera::enableReflections() {reflections = true;}
+
+void Camera::disableReflections() {reflections = false;}
 
 inline double Camera::randf(double min, double max) {
     double f = static_cast<double>(rand()) / RAND_MAX;

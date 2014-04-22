@@ -8,7 +8,7 @@ class Material : public ColoredObject {
    public:
       Color specularCoefficient, diffusionCoefficient;;
       double specularExponent, textureAlpha;
-      short int shadingModel;
+      short unsigned int shadingModel;
       Pixmap *ambientTexture, *diffuseTexture;
       Material();
       Material(String name);

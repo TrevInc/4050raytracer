@@ -7,7 +7,6 @@
 #include "Material.h"
 #include "Image.h"
 #include "Triangle.h"
-#include "BoundingBox.h"
 
 class Parser {
 	private:
@@ -19,7 +18,6 @@ class Parser {
 		List materials;
 		List *faces;
 		Material material;
-		double bbx0, bbx1, bby0, bby1, bbz0, bbz1;
 		int line;
 		void parseMaterialLibrary(String *path);
 		Material *findMaterial(String *material);
@@ -50,7 +48,6 @@ class Parser {
 		~Parser();
 		void parse(const char *path);
 		List *getFaces() const;
-		BoundingBox *getAABB() const;
 };
 
 #endif

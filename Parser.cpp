@@ -1,16 +1,30 @@
 #include "Parser.h"
 
-Parser::Parser() : 
-	faces(new List()), 
-	bbx0(-100000), 
-	bbx1(100000), 
-	bby0(-100000), 
-	bby1(100000), 
-	bbz0(-100000), 
-	bbz1(100000),
-	line(1) {}
+Parser::Parser() : faces(new List()), line(1) {}
 
-Parser::~Parser() {delete faces;}
+Parser::~Parser() {
+	delete faces;
+	Node *node = vertexes.head;
+	while (node) {
+		delete (Vector *)node->data;
+		node = node->next;
+	}
+   node = vertexNormals.head;
+	while (node) {
+		delete (Vector *)node->data;
+		node = node->next;
+	} 
+	node = textureVertexes.head;
+	while (node) {
+		delete (Vector *)node->data;
+		node = node->next;
+	}
+   node = materials.head;
+	while (node) {
+		delete (Material *)node->data;
+		node = node->next;
+	} 
+}
 
 // Parse .obj file
 // creates new shape
@@ -75,12 +89,6 @@ Material *Parser::findMaterial(String *material) {
 // get all the triangles created by the parser
 // only call after parse is complete
 List *Parser::getFaces() const {return faces;}
-
-// get the bounding box surounding the object
-// only call after parse is complete
-BoundingBox *Parser::getAABB() const {
-	return new BoundingBox(bbx1, bbx0, bby1, bby0, bbz1, bbz0);
-}
 
 // Parse f token in .obj file
 // creates new triangle
@@ -326,14 +334,8 @@ void Parser::parse_f() {
 inline void Parser::parse_v() {
 	Vector *vector = new Vector();
 	vector->x = tokenizer->nextToken()->toFloat();
-	if (vector->x > bbx0) bbx0 = vector->x;
-	if (vector->x < bbx1) bbx1 = vector->x;
 	vector->y = tokenizer->nextToken()->toFloat();
-	if (vector->y > bby0) bby0 = vector->y;
-	if (vector->y < bby1) bby1 = vector->y;
 	vector->z = tokenizer->nextToken()->toFloat();
-	if (vector->z > bbz0) bbz0 = vector->z;
-	if (vector->z < bbz1) bbz1 = vector->z;
 	if (*tokenizer->nextToken() != "\n") {
 		printf("Syntax Error: line %d   unexpected token\n", line);
 		exit(1);

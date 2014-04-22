@@ -1,7 +1,6 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "Node.h"
 #include "List.h"
 #include "Shape.h"
 #include "Light.h"

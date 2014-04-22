@@ -7,8 +7,8 @@
 #include "Color.h"
 #include "HitData.h"
 #include "List.h"
-#include "Shape.h"
 #include "Scene.h"
+#include "Triangle.h"
 
 #define MAX_DOUBLE 100000000000000000
 
@@ -17,7 +17,7 @@ class Camera {
       double screenWidth, aspectRatio, focalLength;
       int screenPixelWidth, antialiasingLevel, recursionLevel;
       Vector viewPoint, direction, up;
-      bool projectionView, antialiasing;
+      bool projectionView, antialiasing, reflections;
       HitData *trace(const Vector *ray, const Vector *pixelPosition);
       Color shade(const HitData *hitData);
       const Scene *scene;
@@ -39,6 +39,8 @@ class Camera {
       void disableAntialiasing();
       void setRecursionLevel(const int level);
       void setAntialiasingLevel(const int level);
+      void enableReflections();
+      void disableReflections();
 };
 
 #endif

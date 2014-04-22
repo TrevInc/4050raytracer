@@ -14,14 +14,15 @@ List::~List() {
 
 const void *List::getElementAtIndex(const int index) const {
  	Node *node(head);
-	for (int ndx = 0; ndx < index; ndx++) node = node->next;
+	for (int ndx = 0; ndx < index; ++ndx) node = node->next;
 	return node->data;
 }
 
 const unsigned int List::getSize() const {return size;}
 
 void List::add(const void *object) {
-	Node *node(new Node(object));
+	Node *node = new Node();
+	node->data = object;
    if (!head) head = node; 
    else tail->next = node;
    tail = node;

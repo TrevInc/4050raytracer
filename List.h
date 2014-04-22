@@ -1,8 +1,12 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include "Node.h"
 #include <cstddef>
+
+struct Node {
+	const void *data;
+   Node *next;
+};
 
 class List {
 	private:

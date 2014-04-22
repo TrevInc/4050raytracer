@@ -7,6 +7,8 @@
 #include "Light.h"
 #include "Material.h"
 
+#define MAGIC_NUMBER 0.0000001
+
 class Shape : public Object {
    public:
       Material material;

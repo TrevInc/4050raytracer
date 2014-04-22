@@ -14,11 +14,11 @@ class RayTracer {
     public:
        	RayTracer();
        	~RayTracer();
-       	void addShape(const Shape *shape);
        	void addLight(const Light *light);
-       	void load(const char *path);
-       	void save(const char *path);
+       	void loadShape(const char *path);
+       	void saveImage(const char *path);
        	const Pixmap *getPixmap() const;
+       	const Scene *getScene() const;
        	void render();
        	void ambientLight(const Color color);
        	void aspectRatio(const double ratio);
@@ -35,6 +35,8 @@ class RayTracer {
 			void disableAntialiasing();
 			void recursionLevel(const int level);
 			void antialiasingLevel(const int level);
+			void enableReflections();
+			void disableReflections();
 };
 
 #endif

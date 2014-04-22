@@ -1,10 +1,13 @@
-#ifndef PIXMAP
-#define PIXMAP
+#ifndef PIXMAP_H
+#define PIXMAP_H
 
-#include "RGBApixel.h"
-#include "Object.h"
+#include "Color.h"
 
-class Pixmap : public Object {
+struct RGBApixel {
+   unsigned char red, green, blue, alpha;
+};
+
+class Pixmap {
    private:
       const int columnSize, rowSize;
       RGBApixel *pixmap;
@@ -14,8 +17,8 @@ class Pixmap : public Object {
       RGBApixel *getPixles();
       const int getRowSize();
       const int getColumnSize();
-      void setPixelAt(const int column, const int row, RGBApixel pixel);
-      RGBApixel *getPixelAt(const int column, const int row);
+      void setPixelAt(const int column, const int row, const Color color);
+      const Color getPixelAt(const int column, const int row);
 };
 
 #endif

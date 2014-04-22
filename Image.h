@@ -3,6 +3,7 @@
 
 #include "Magick++.h"
 #include "Pixmap.h"
+#include "String.h"
 
 class Image {
    private:
