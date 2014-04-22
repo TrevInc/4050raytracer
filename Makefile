@@ -8,10 +8,10 @@ CFLAGS = -O4 -Wall `Magick++-config --cppflags`
 LFLAGS = -O4 -Wall `Magick++-config --ldflags`
 
 ifeq ("$(shell uname)", "Darwin")
-  LDFLAGS = -framework Foundation -lm
+  LDFLAGS = -framework Foundation -framework GLUT -framework OpenGL -lm
 else
   ifeq ("$(shell uname)", "Linux")
-    LDFLAGS = -lMagick++ -lm
+    LDFLAGS = -lglut -lGL -lGLU -lMagick++ -lm
   endif
 endif
 
