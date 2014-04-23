@@ -7,12 +7,11 @@
 
 class RayTracer {
     private:
-
-    public:
        	Scene scene;
        	Parser parser;
        	Pixmap *pixmap;
       	Camera camera;
+    public:
        	RayTracer();
        	~RayTracer();
        	void addLight(const Light *light);

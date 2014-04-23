@@ -38,11 +38,13 @@ String &String::operator=(const char *s) {
 
 String &String::operator+=(const String &s) {
 	if (this == &s) return *this;
+	if (string == '\0') return *this = s;
 	length = length + s.length;
 	char buff[length + 1];
 	strcpy(buff, string);
 	strcat(buff, s.string);
 	delete [] string;
+	string = new char[length + 1];
 	strcpy(string, buff);
 	return *this;
 }

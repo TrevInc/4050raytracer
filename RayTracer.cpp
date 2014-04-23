@@ -14,7 +14,7 @@ void RayTracer::saveImage(const char *path) {
 void RayTracer::loadShape(const char *path) {
 	Parser parser;
 	parser.parse(path);
-	List *faces = parser.getFaces();
+	const List *faces = parser.getFaces();
 	Node *node = faces->head;
 	while (node) {
 		scene.addShape((Shape *)node->data);

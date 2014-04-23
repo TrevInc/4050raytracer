@@ -19,7 +19,7 @@ class Parser {
 		List *faces;
 		Material material;
 		int line;
-		void parseMaterialLibrary(String *path);
+		void parseMaterialLibrary(String path);
 		Material *findMaterial(String *material);
 		void parse_v();
 		void parse_vn();
@@ -47,7 +47,7 @@ class Parser {
 		Parser();
 		~Parser();
 		void parse(const char *path);
-		List *getFaces() const;
+		const List *getFaces() const;
 };
 
 #endif

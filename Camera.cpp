@@ -101,14 +101,14 @@ inline Color Camera::shade(const HitData *hitData) {
          node = node->next;
       }
       if (shape->textureMap && material.ambientTexture) {
-         Color textureColor = scene->ambientLight * shape->material.ambientTexture->getPixelAt(
-         	hitData->textureCoordinate.x * shape->material.ambientTexture->getRowSize(),
-         	hitData->textureCoordinate.y * shape->material.ambientTexture->getRowSize());
+         Color textureColor = scene->ambientLight * material.ambientTexture->getPixelAt(
+         	hitData->textureCoordinate.x * material.ambientTexture->getRowSize(),
+         	hitData->textureCoordinate.y * material.ambientTexture->getRowSize());
          color += (textureColor * material.textureAlpha) + material.color;
-    	} else color += shape->material.color + scene->ambientLight; 
+    	} else color += material.color + scene->ambientLight; 
     	if (reflections) {
     		hit = trace(&hitData->reflectionRay, &hitData->hitPoint);
-   		color += shade(hit) * shape->material.specularCoefficient;
+   		color += shade(hit) * material.specularCoefficient;
    		delete hit;
    	}
    }

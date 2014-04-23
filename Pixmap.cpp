@@ -23,5 +23,5 @@ void Pixmap::setPixelAt(const int column, const int row, const Color color) {
 
 const Color Pixmap::getPixelAt(const int column, const int row) {
 	unsigned int ndx(columnSize * row + column);
-   return Color(pixmap[ndx].red, pixmap[ndx].green, pixmap[ndx].blue);
+   return Color(pixmap[ndx].red / 255.0, pixmap[ndx].green / 255.0, pixmap[ndx].blue / 255.0);
 }

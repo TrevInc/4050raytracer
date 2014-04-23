@@ -59,11 +59,11 @@ Ns 200.0000
 illum 2
 
 newmtl green_flag
-Ka 0.0000 0.2000 0.0000
-Kd 0.0000 0.8000 0.0000
+Ka 0.0000 0.0000 0.0000
+Kd 0.0000 0.0000 0.0000
 illum 1
-map_Ka materials/brazil-flag.png
-map_Kd materials/brazil-flag.png
+map_Ka models/brazil-flag2.png
+map_Kd models/brazil-flag2.png
 
 newmtl 03_-_Default
 Ka  0.0 0.0 0.0
@@ -80,3 +80,10 @@ Ks  0.0 0.0 0.0
 d  1.0
 Ns  10.0
 illum 2
+
+newmtl table
+Ka 0.0 0.0 0.0
+Kd 0.0 0.0 0.0
+illum 1
+map_Ka models/wood.png
+map_Kd models/wood.png

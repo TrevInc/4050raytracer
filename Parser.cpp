@@ -26,8 +26,6 @@ Parser::~Parser() {
 	} 
 }
 
-// Parse .obj file
-// creates new shape
 void Parser::parse(const char *path) {
 	tokenizer = new Tokenizer();
 	tokenizer->tokenize(path);
@@ -44,18 +42,19 @@ void Parser::parse(const char *path) {
 		else if (*token == "p") parse_p();
 		else if (*token == "s") parse_s();
 		else if (*token == "#") parse_comment();
-		else if (*token == "\n") line++;
-		else {}
+		else if (*token == "\n") ++line;
+		else { 
+			printf("Syntax Error: line %d   unexpected token\n", line);
+			exit(1);
+		}
 		token = tokenizer->nextToken();
 	}
 	delete tokenizer;
 }
 
-// Parse .mtl file
-// creates new material
-void Parser::parseMaterialLibrary(String *path) {
+inline void Parser::parseMaterialLibrary(String path) {
 	materialTokenizer = new Tokenizer();
-	materialTokenizer->tokenize(path->getString());
+	materialTokenizer->tokenize(path.getString());
 	String *token = materialTokenizer->nextToken();
 	while (token != NULL) {
 		if (*token == "newmtl") parse_newmtl();
@@ -69,15 +68,17 @@ void Parser::parseMaterialLibrary(String *path) {
 		else if (*token == "map_Ks") parse_map_Ks();
 		else if (*token == "d") parse_d();
 		else if (*token == "#") parse_material_comment();
-		else {}
+		else if (*token == "\n") {}
+		else { 
+			printf("Syntax Error: line %d   unexpected token\n", line);
+			exit(1);
+		}
 		token = materialTokenizer->nextToken();
 	}
 	delete materialTokenizer;
 }
 
-// Find material in material list created from material parser
-// returns material to use for the object
-Material *Parser::findMaterial(String *material) {
+inline Material *Parser::findMaterial(String *material) {
 	Node *node = materials.head;
 	while (node) {
 		if (((Material *)node->data)->getName() == *material) return (Material *)node->data;
@@ -86,14 +87,9 @@ Material *Parser::findMaterial(String *material) {
 	return NULL;
 }
 
-// get all the triangles created by the parser
-// only call after parse is complete
-List *Parser::getFaces() const {return faces;}
+const List *Parser::getFaces() const {return faces;}
 
-// Parse f token in .obj file
-// creates new triangle
-// handles three possible configurations v, v/t, v/vn/t
-void Parser::parse_f() {
+inline void Parser::parse_f() {
 	int v1, v2, v3, v4, n1, n2, n3, n4, t1, t2, t3, t4;
 	String *token;
 	v1 = tokenizer->nextToken()->toInt() - 1;
@@ -122,7 +118,7 @@ void Parser::parse_f() {
 				*(Vector *)vertexes.getElementAtIndex(v3),
 				*(Vector *)vertexes.getElementAtIndex(v4));
 			faces->add(triangle2);
-			line++;
+			++line;
 			return;
 		}
 		Triangle *triangle = new Triangle(
@@ -132,7 +128,7 @@ void Parser::parse_f() {
 			*(Vector *)vertexes.getElementAtIndex(v2),
 			*(Vector *)vertexes.getElementAtIndex(v3));
 		faces->add(triangle);
-		line++;
+		++line;
 		return;
 	} 
 	token = tokenizer->nextToken();
@@ -178,7 +174,7 @@ void Parser::parse_f() {
 					*(Vector *)textureVertexes.getElementAtIndex(t3),
 					*(Vector *)textureVertexes.getElementAtIndex(t4));
 				faces->add(triangle2);
-				line++;
+				++line;
 				return;
 			}
 			Triangle *triangle = new Triangle(
@@ -192,7 +188,7 @@ void Parser::parse_f() {
 				*(Vector *)textureVertexes.getElementAtIndex(t2),
 				*(Vector *)textureVertexes.getElementAtIndex(t3));
 			faces->add(triangle);
-			line++;
+			++line;
 			return;	
 		}
 		n1 = tokenizer->nextToken()->toInt() - 1;
@@ -248,7 +244,7 @@ void Parser::parse_f() {
 				*(Vector *)vertexNormals.getElementAtIndex(n3),
 				*(Vector *)vertexNormals.getElementAtIndex(n4));
 			faces->add(triangle2);
-			line++;
+			++line;
 			return;
 		}
 		Triangle *triangle = new Triangle(
@@ -266,7 +262,7 @@ void Parser::parse_f() {
 			*(Vector *)textureVertexes.getElementAtIndex(t2),
 			*(Vector *)textureVertexes.getElementAtIndex(t3));
 		faces->add(triangle);
-		line++;
+		++line;
 		return;
 	}
 	if (*token == "/") {
@@ -311,7 +307,7 @@ void Parser::parse_f() {
 				*(Vector *)vertexNormals.getElementAtIndex(n3),
 				*(Vector *)vertexNormals.getElementAtIndex(n4));
 			faces->add(triangle2);
-			line++;
+			++line;
 			return;
 		}
 		Triangle *triangle = new Triangle(
@@ -325,12 +321,11 @@ void Parser::parse_f() {
 			*(Vector *)vertexNormals.getElementAtIndex(n2),
 			*(Vector *)vertexNormals.getElementAtIndex(n3));
 		faces->add(triangle);
-		line++;
+		++line;
 		return;
 	}
 }
 
-// Parse v token in .obj file
 inline void Parser::parse_v() {
 	Vector *vector = new Vector();
 	vector->x = tokenizer->nextToken()->toFloat();
@@ -341,10 +336,9 @@ inline void Parser::parse_v() {
 		exit(1);
 	}
 	vertexes.add(vector);
-	line++;
+	++line;
 }
 
-// Parse vn token in .obj file
 inline void Parser::parse_vn() {
 	Vector *vector = new Vector();
 	vector->x = tokenizer->nextToken()->toFloat();
@@ -355,11 +349,9 @@ inline void Parser::parse_vn() {
 		exit(1);
 	}
 	vertexNormals.add(vector);
-	line++;
+	++line;
 }
 
-// Parse vt token in .obj file
-// adds to texture vertex list
 inline void Parser::parse_vt() {
 	Vector *vector = new Vector();
 	vector->x = tokenizer->nextToken()->toFloat();
@@ -371,22 +363,17 @@ inline void Parser::parse_vt() {
 		} 
 	}
 	textureVertexes.add(vector); 
-	line++;
+	++line;
 }
 
-// Parse g token in .obj file
-// ignored
-void Parser::parse_g() {
+inline void Parser::parse_g() {
 	printf("Warning: line %d   object group declarations not supported\n", line);
 	fflush(stdout);
 	if (*tokenizer->nextToken() != "\n") tokenizer->nextToken();
-	line++;
+	++line;
 }
 
-// Parse usemtl token in .obj file
-// gets material to use from token argument
-// puts material on the stack
-void Parser::parse_usemtl() {
+inline void Parser::parse_usemtl() {
 	String *token = tokenizer->nextToken();
 	Material *mtl = findMaterial(token);
 	if (!mtl) {
@@ -395,149 +382,140 @@ void Parser::parse_usemtl() {
 	}
 	material = *mtl;
 	tokenizer->nextToken();
-	line++;
+	++line;
 }
 
-// Parse Ka token in .mtl file
-// sets the Ka(ambient) value of the material being created
-void Parser::parse_Ka() {
+inline void Parser::parse_Ka() {
 	Color color;
 	color.setRed(materialTokenizer->nextToken()->toFloat()); 
 	color.setGreen(materialTokenizer->nextToken()->toFloat()); 
 	color.setBlue(materialTokenizer->nextToken()->toFloat());
 	((Material *)materials.tail->data)->color = color;
-	materialTokenizer->nextToken();
+	if (*materialTokenizer->nextToken() != '\n') {
+		printf("Syntax Error: line %d\n   unexpected token", line);
+		exit(1);
+	}
 }
 
-// Parse Kd token in .mtl file
-// sets the Kd(diffuse) value of the material being created
-void Parser::parse_Kd() {
+inline void Parser::parse_Kd() {
 	Color color;
 	color.setRed(materialTokenizer->nextToken()->toFloat()); 
 	color.setGreen(materialTokenizer->nextToken()->toFloat()); 
 	color.setBlue(materialTokenizer->nextToken()->toFloat());
 	((Material *)materials.tail->data)->diffusionCoefficient = color;
-	materialTokenizer->nextToken();
+	if (*materialTokenizer->nextToken() != '\n') {
+		printf("Syntax Error: line %d\n   unexpected token", line);
+		exit(1);
+	}
 }
 
-// Parse Ks(specular) value of the material being created
-// .mtl file
-void Parser::parse_Ks() {
+inline void Parser::parse_Ks() {
 	Color color;
 	color.setRed(materialTokenizer->nextToken()->toFloat()); 
 	color.setGreen(materialTokenizer->nextToken()->toFloat()); 
 	color.setBlue(materialTokenizer->nextToken()->toFloat());
 	((Material *)materials.tail->data)->specularCoefficient = color;
-	materialTokenizer->nextToken();
+	if (*materialTokenizer->nextToken() != '\n') {
+		printf("Syntax Error: line %d\n   unexpected token", line);
+		exit(1);
+	}
 }
 
-// Parse Ns(specular exponent) value of the material being created
-// .mtl file
-void Parser::parse_Ns() {
+inline void Parser::parse_Ns() {
 	((Material *)materials.tail->data)->specularExponent = materialTokenizer->nextToken()->toInt();
-	materialTokenizer->nextToken();
+	if (*materialTokenizer->nextToken() != '\n') {
+		printf("Syntax Error: line %d\n   unexpected token", line);
+		exit(1);
+	}
 }
 
-// Parse newmtl token
-// creates a new material
-// name comes from token argument
-// .mtl file
-void Parser::parse_newmtl() {
+inline void Parser::parse_newmtl() {
 	materials.add(new Material(*materialTokenizer->nextToken()));
-	materialTokenizer->nextToken();
+	if (*materialTokenizer->nextToken() != '\n') {
+		printf("Syntax Error: line %d\n   unexpected token", line);
+		exit(1);
+	}
 }
 
-// Parse illum token
-// sets the shading model of the material being created
-// .mtl file
-void Parser::parse_illum() {
+inline void Parser::parse_illum() {
 	((Material *)materials.tail->data)->shadingModel = materialTokenizer->nextToken()->toInt();
-	materialTokenizer->nextToken();
+	if (*materialTokenizer->nextToken() != '\n') {
+		printf("Syntax Error: line %d\n   unexpected token", line);
+		exit(1);
+	}
 }
 
-// Parse mtllib token
-// sets the material library to parse
-// .obj file
-void Parser::parse_mtllib() { 
-	parseMaterialLibrary(tokenizer->nextToken());
-	tokenizer->nextToken();
-	line++;
-}
-
-// Parse map_Ka
-// *funcionality may be removed
-// .mtl file
-void Parser::parse_map_Ka() {
-	Image image;
-	((Material *)materials.tail->data)->ambientTexture = image.readImage(*materialTokenizer->nextToken());
-	materialTokenizer->nextToken();
-}
-
-// Parse map_Kd token
-// creates and adds texture to material
-// .mtl file
-void Parser::parse_map_Kd() {
-	Image image;
-	((Material *)materials.tail->data)->diffuseTexture = image.readImage(*materialTokenizer->nextToken());
-	materialTokenizer->nextToken();
-}
-
-// Parse map_Ks
-// ignored
-// .mtl file
-void Parser::parse_map_Ks() {
+inline void Parser::parse_mtllib() { 
+	String path;
 	String *token = tokenizer->nextToken();
-	while (*token != '\n') token = tokenizer->nextToken();
+	while (*token != "\n") {
+		path += *token;
+		token = tokenizer->nextToken();
+	}
+	parseMaterialLibrary(path);
+	++line;
 }
 
-// Parse d token
-// sets the alpha value of the texture map
-// .mtl file
-void Parser::parse_d() {
+inline void Parser::parse_map_Ka() {
+	Image image;
+	String path;
+	String *token = materialTokenizer->nextToken();
+	while (*token != "\n") {
+		path += *token;
+		token = materialTokenizer->nextToken();
+	}
+	((Material *)materials.tail->data)->ambientTexture = image.readImage(path);
+}
+
+inline void Parser::parse_map_Kd() {
+	Image image;
+	String path;
+	String *token = materialTokenizer->nextToken();
+	while (*token != "\n") {
+		path += *token;
+		token = materialTokenizer->nextToken();
+	}
+	((Material *)materials.tail->data)->diffuseTexture = image.readImage(path);
+}
+
+inline void Parser::parse_map_Ks() {
+	while (*tokenizer->nextToken() != '\n');
+}
+
+inline void Parser::parse_d() {
 	material.textureAlpha = materialTokenizer->nextToken()->toFloat();
-	materialTokenizer->nextToken();
+	if (*materialTokenizer->nextToken() != '\n') {
+		printf("Syntax Error: line %d\n   unexpected token", line);
+		exit(1);
+	}
 }
 
-// Parse s token
-// ignored
-// .obj file
-void Parser::parse_s() {
+inline void Parser::parse_s() {
 	printf("Warning: line %d   ? declarations not supported\n", line);
 	fflush(stdout);
-	String *token = tokenizer->nextToken();
-	while (*token != '\n') token = tokenizer->nextToken();
-	line++;
+	while (*tokenizer->nextToken() != '\n');
+	++line;
 }
 
-// Parse l token
-// ignored
-// .obj file
-void Parser::parse_l() {
+inline void Parser::parse_l() {
 	printf("Warning: line %d   line declarations not supported\n", line);
 	fflush(stdout);
-	String *token = tokenizer->nextToken();
-	while (*token != '\n') token = tokenizer->nextToken();
-	line++;
+	while (*tokenizer->nextToken() != '\n');
+	++line;
 }
 
-// Parse p token
-// ignored
-// .obj file
-void Parser::parse_p() {
+inline void Parser::parse_p() {
 	printf("Warning: line %d   point declarations not supported\n", line);
 	fflush(stdout);
-	String *token = tokenizer->nextToken();
-	while (*token != '\n') token = tokenizer->nextToken();
-	line++;
+	while (*tokenizer->nextToken() != '\n');
+	++line;
 }
 
-// Parse comment in .mtl file
-void Parser::parse_material_comment() {
+inline void Parser::parse_material_comment() {
 	while (*materialTokenizer->nextToken() != "\n");
 }
 
-// Parse comment in .obj file
-void Parser::parse_comment() {
+inline void Parser::parse_comment() {
 	while (*tokenizer->nextToken() != "\n");
-	line++;
+	++line;
 }

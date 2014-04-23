@@ -1,7 +1,7 @@
 #
 # object Teapot001
 #
-mtllib materials.mtl
+mtllib models/materials.mtl
 v  7.0000 0.0000 12.0000
 v  4.9700 -4.9700 12.0000
 v  4.9811 -4.9811 12.4922
@@ -362,7 +362,7 @@ vt 0.0000 0.9500 0.0000
 # 78 texture coords
 
 g Teapot001
-usemtl flat_green
+usemtl red
 f 1/1/1 2/2/2 3/3/3 4/4/4 
 f 4/4/4 3/3/3 5/5/5 6/6/6 
 f 2/2/2 7/7/7 8/8/8 3/3/3 
