@@ -1,0 +1,16 @@
+Game Behavior Checklist
+
+Start 3 lives and 0 points
+Touch Signaled Ball to get pts
+15 pts = Extra life
+Touch Wrong Ball - die
+
+Game over screen - render w/ high score
+
+[ ] Implement 5 ball types - red, green, yellow, blue, grey
+[ ] implement collision with right and wrong ball types
+[ ] add symbols to ball sprites for colorblind people (like me!)
+[ ] edit scoring rules and implementation
+[ ] add target indicator
+[ ] edit ball respawn
+[ ] make game over screen routine stateful 
