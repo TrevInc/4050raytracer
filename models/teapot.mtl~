@@ -1,0 +1,16 @@
+# teapot material
+newmtl red
+Ka  0.2 0.0 0.0
+Kd  0.7 0.0 0.0
+Ks  0.1 0.1 0.1
+d  1.0
+Ns  10.0
+illum 2
+
+# table material
+newmtl table
+Ka 0.0 0.0 0.0
+Kd 0.0 0.0 0.0
+illum 1
+map_Ka models/wood_texture.png
+map_Kd models/wood_texture.png

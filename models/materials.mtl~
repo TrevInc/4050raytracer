@@ -85,5 +85,5 @@ newmtl table
 Ka 0.0 0.0 0.0
 Kd 0.0 0.0 0.0
 illum 1
-map_Ka models/wood.png
-map_Kd models/wood.png
+map_Ka models/wood_texture.png
+map_Kd models/wood_texture.png
